@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>smart_palletizer</name>
+  <version>0.0.1</version>
+  <description>Box detection node</description>
+  <maintainer email="kestenfariz@gmail.com">Fariz Kesten</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>message_filters</depend>
+</package>
