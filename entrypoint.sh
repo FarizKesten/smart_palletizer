@@ -1,4 +1,5 @@
 #!/bin/bash
 source /opt/ros/noetic/setup.bash
-export QT_X11_NO_MITSHM=1
+source /opt/conda/etc/profile.d/conda.sh
+conda activate rosenv
 exec "$@"

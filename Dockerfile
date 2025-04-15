@@ -22,6 +22,8 @@ RUN apt update && apt install -y \
 RUN apt update && apt install -y \
     build-essential \
     git \
+    vim \
+    tmux \
     wget \
     curl \
     libboost-all-dev \
@@ -36,35 +38,50 @@ RUN apt update && apt install -y \
     libtiff-dev \
     libusb-1.0-0-dev \
     pkg-config \
-    python3-pip \
-    python3-setuptools \
-    python3-numpy \
-    python3-opencv \
     texlive-latex-base \
     texlive-fonts-recommended \
     texlive-fonts-extra \
     texlive-latex-extra \
     latexmk \
-    && ln -s /usr/bin/python3 /usr/bin/python \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Jupyter and IPython kernel
-RUN pip3 install --no-cache-dir \
-    notebook \
-    jupyterlab \
-    ipykernel \
-    && python3 -m ipykernel install --user
+# try blenderproc
+RUN apt update && apt install -y \
+    blender \
+    blenderproc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Automatically source ROS in every shell
-RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+RUN apt update && apt install -y \
+    qemu-user-static \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy entrypoint
+# Install Miniforge (ARM-compatible Conda)
+ENV CONDA_DIR=/opt/conda
+RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O /tmp/miniforge.sh && \
+    bash /tmp/miniforge.sh -b -p $CONDA_DIR && \
+    rm /tmp/miniforge.sh
+
+# Set Conda in PATH and activate for all shells
+ENV PATH=$CONDA_DIR/bin:$PATH
+RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> /root/.bashrc
+
+# Create and activate Conda env
+RUN conda init bash && \
+    conda create -n rosenv python=3.8 -y && \
+    echo "conda activate rosenv" >> /root/.bashrc
+
+# Install Python packages in Conda env
+RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
+    open3d dash werkzeug numpy pandas scikit-learn \
+    opencv-python ipympl matplotlib tqdm \
+    torch torchvision ultralytics \
+    notebook jupyterlab ipykernel albumentations \
+
+
+
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Copy and install Python requirements (e.g., for documentation)
-COPY docs/requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 # Set entrypoint and default command
 ENTRYPOINT ["/entrypoint.sh"]
