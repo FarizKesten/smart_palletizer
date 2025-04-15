@@ -46,10 +46,10 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # try blenderproc
-RUN apt update && apt install -y \
-    blender \
-    blenderproc \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt update && apt install -y \
+#     blender \
+#     blenderproc \
+#     && rm -rf /var/lib/apt/lists/*
 
 RUN apt update && apt install -y \
     qemu-user-static \
@@ -75,7 +75,7 @@ RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
     open3d dash werkzeug numpy pandas scikit-learn \
     opencv-python ipympl matplotlib tqdm \
     torch torchvision ultralytics \
-    notebook jupyterlab ipykernel albumentations \
+    notebook jupyterlab ipykernel albumentations
 
 
 

@@ -1,15 +1,23 @@
 {
-  "name": "ros2-foxy-gui",
+  "name": "ros2-noetic-gui",
   "build": {
     "dockerfile": "../Dockerfile"
   },
+
   "runArgs": [
-    "--net=host",                      // Needed for ROS 2 discovery
-    "-e", "DISPLAY=${localEnv:DISPLAY}", // Pass host DISPLAY env
-    "-e", "QT_X11_NO_MITSHM=1",       // Avoid shared memory issues
-    "-v", "/tmp/.X11-unix:/tmp/.X11-unix", // Mount X11 socket
-    "--privileged"                    // Needed for some GUI/Gazebo features
+    "-e", "DISPLAY=host.docker.internal:0",
+    "-e", "QT_X11_NO_MITSHM=1",
+    "-e", "LIBGL_ALWAYS_INDIRECT=1",
+    "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+    "-v", "${localEnv:HOME}/.Xauthority:/root/.Xauthority:rw"
   ],
+
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    // "source=/tmp/.X11-unix,target=/tmp/.X11-unix",
+    // "source=${localEnv:HOME}/.Xauthority,target=/root/.Xauthority"
+  ],
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -18,12 +26,6 @@
       ]
     }
   },
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-  ],
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "bash -c 'source /opt/ros/noetic/setup.bash && roscore & sleep 3 && rostopic list'"
-
-
-
+  "postCreateCommand": "bash -c 'source /opt/ros/noetic/setup.bash && roscore'"
 }

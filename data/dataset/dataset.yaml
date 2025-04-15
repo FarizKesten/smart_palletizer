@@ -1,0 +1,8 @@
+# dataset.yaml
+path: /workspace/data/dataset
+train: /workspace/data/dataset/train/images
+val: /workspace/data/dataset/val/images
+nc: 2
+names:
+  0: medium_box
+  1: small_box
