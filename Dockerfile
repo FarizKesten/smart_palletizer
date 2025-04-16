@@ -43,6 +43,7 @@ RUN apt update && apt install -y \
     texlive-fonts-extra \
     texlive-latex-extra \
     latexmk \
+    x11-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # try blenderproc

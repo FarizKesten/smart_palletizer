@@ -1,3 +1,5 @@
 *.bag
 *.old
 build*
+
+*.cpython-38.pyc
