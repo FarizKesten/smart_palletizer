@@ -48,6 +48,8 @@ Note that you are free to use classical detection methods, or even [**synthetic*
 Here is an example of detected medium box:
 ![medium_box](./docs/imgs/medium_box.png)
 
+---
+
 ### My Solution for 2D Box Detection
 The pipeline involves synthetic data generation, YOLO model training, and real-time box detection using ROS.
 
@@ -102,6 +104,8 @@ The goal of this task is to detect planar surfaces in the point cloud of the box
 
 ![planar_patches](./docs/imgs/planar_patches.png)
 
+---
+
 ### My Solution for Planar Patch Detection
 
 - The Open3D library was used to detect planar patches from point clouds generated using depth images.
@@ -118,12 +122,15 @@ Example visualizations of detected planar patches:
 ![Planar Patch Detection 1](docs/imgs/planar1.png)
 ![Planar Patch Detection 2](docs/imgs/planar2.png)
 
+---
 
 ### 3. Point Cloud post processing
 
 ---
 
 Raw Point Clouds provided in the data folder are noisy, the goal of this task is to post-process the pointcloud to get a clean pointcloud for further processing, without jeopardizing the dimensions of the box too much.
+
+---
 
 ### My Solution for Point Cloud Cleaning
 
@@ -138,6 +145,8 @@ These steps significantly improve the quality and usability of the point clouds 
 All steps are demonstrated in:
 `notebooks/A3_clean_point_clouds.ipynb`
 
+---
+
 Example of a cleaned point cloud:
 ![Cleaned Point Cloud](./docs/imgs/clean_cloud.png)
 
@@ -150,6 +159,8 @@ This task aims to estimate 6D poses (Translation, Orientation) of the boxes in t
 
 ![boxes_poses](./docs/imgs/boxes_poses.png)
 
+---
+
 ### My Solution for Pose Estimation
 
 - A solution was implemented in `notebooks/A4_estimate_box_pose.ipynb`.
@@ -158,6 +169,7 @@ This task aims to estimate 6D poses (Translation, Orientation) of the boxes in t
 - Using the **surface normal** of the plane, one axis of the box is derived. The orientation is then inferred by assigning and rotating the axes based on the identified face type (top, front, or side).
 - The **translation** is taken as the center of the fitted plane.
 - The final 6D pose in the **world frame** is computed using the camera-to-world **extrinsics matrix**.
+
 
 Pose estimation example:
 ![Pose Estimation](docs/imgs/rotation_estimation.png)
@@ -174,6 +186,7 @@ The entire pipeline is structured into three main components:
 Pipeline diagram:
 ![Pipeline](docs/imgs/pipeline.png)
 
+---
 
 ## Evaluation
 
@@ -210,6 +223,7 @@ Documentation for the implementation is provided in the `docs/` folder.
 The full documentation is also available on GitHub.
 
 
+---
 
 ## My Solution to ROS Implementation
 
@@ -230,3 +244,4 @@ rqt_image_view
 
 ```
 
+---
