@@ -11,7 +11,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y \
     ros-noetic-desktop-full \
     ros-noetic-pcl-ros \
-    ros-noetic-open3d-conversions \
     ros-noetic-pcl-conversions \
     ros-noetic-rviz \
     ros-noetic-gazebo-ros-pkgs \
@@ -83,7 +82,7 @@ RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
     opencv-python ipympl matplotlib tqdm \
     torch torchvision ultralytics \
     notebook jupyterlab ipykernel albumentations \
-    catkin_pkg empy
+    catkin_pkg empy rospkg
 
 # also install in base env just in case
 # RUN pip install --no-cache-dir \
