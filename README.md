@@ -1,88 +1,114 @@
-# Smart Palletizer - Solution Summary
+# Smart Palletizer Challenge – Solution Summary
 
-## 1. 2D Box Detection
+This document summarizes my complete solution to the NEURA Robotics Smart Palletizer challenge, focusing on methodology, implementation, and results for each task.
 
-### Approach
-- Used synthetic training data created from real box templates.
-- Generated diverse backgrounds and inserted box crops at various positions.
-- Trained a YOLOv8 model on this synthetic dataset.
+---
 
-### Components
-- `notebooks/A1_prepare_training_yolo.ipynb`: Synthetic data generation.
-- `notebooks/A1_Train_YOLO_Model.ipynb`: YOLO model training.
-- `notebooks/A1_run_yolo_detector.ipynb`: Detection visualization.
+## 1. 2D Box Detection – Synthetic Dataset + YOLO
 
-### Result
-- Accurate 2D detection of small and medium boxes using color images and YOLOv8.
-- Used depth thresholding to mask irrelevant regions.
+### Synthetic Dataset Preparation
+
+Due to limited real annotated data, I created a synthetic dataset using real box crops and background images to simulate various scenarios.
+
+#### Steps:
+1. **Crop Boxes**: Extracted box crops from real RGB images in `data/small_box` and `data/medium_box`.
+2. **Collect Backgrounds**: Used various backgrounds from the `data/backgrounds/` folder.
+3. **Overlay Crops Randomly**: Pasted cropped boxes onto backgrounds at random positions, scales, and sometimes with small rotations.
+4. **Save in YOLO Format**: Saved the images and label files compatible with YOLO format for training.
+
+This process is detailed in the notebook:
+`notebooks/A1_prepare_training_yolo.ipynb`
+
+#### Example – Synthetic Training Sample
+
+![Synthetic Training Data](docs/imgs/synthetic_training_data.jpg)
+
+This method allowed me to create hundreds of varied training examples that improved generalization for YOLO.
+
+---
+
+### YOLO Model Training
+- Trained a YOLOv8 model using the synthetic dataset.
+- Converted annotations to YOLO format (bounding boxes normalized between 0–1).
+- Trained in Google Colab for faster iteration.
+
+Training process notebook: `notebooks/A1_Train_YOLO_Model.ipynb`
+
+### Inference with Masked YOLO
+- The `MaskedYOLODetector` class masks out irrelevant regions using depth filtering before running YOLO.
+- Helps reduce false positives.
+
+Detection demo: `notebooks/A1_run_yolo_detector.ipynb`
+
+![YOLO Detection Output](docs/imgs/yolo_detection.png)
 
 ---
 
 ## 2. Planar Patch Detection (3D)
 
-### Approach
 - Used Open3D to convert depth images into point clouds.
-- Applied normal filtering and RANSAC to isolate flat surfaces.
-- Grouped planar patches per detected box.
+- Applied plane segmentation with RANSAC and filtered patches based on area and orientation.
 
-### Components
-- `notebooks/A2_run_patch_detector.ipynb`: End-to-end planar patch detection.
-- Detected patches filtered by size, orientation, and alignment.
+Demo notebook: `notebooks/A2_run_patch_detector.ipynb`
 
-### Result
-- Robust detection of top box surfaces in cluttered 3D environments.
+Examples:
+![Planar Patch Detection 1](docs/imgs/planar1.png)
+![Planar Patch Detection 2](docs/imgs/planar2.png)
 
 ---
 
-## 3. Point Cloud Post-Processing
+## 3. Point Cloud Cleaning
 
-### Approach
-- Voxel downsampling to reduce noise.
-- Statistical outlier removal.
-- Plane segmentation to filter valid surfaces.
+- Downsampled with voxel grid
+- Removed outliers with statistical methods
+- Fitted planes using RANSAC and filtered noise
 
-### Components
-- `notebooks/A3_clean_point_clouds.ipynb`
+Notebook: `notebooks/A3_clean_point_clouds.ipynb`
 
-### Result
-- Clean and compact point clouds, preserving box dimensions.
 
 ---
 
 ## 4. Box Pose Estimation (6D)
 
-### Approach
-- Used only top planar patch for stability.
-- Estimated rotation matrix based on known face orientation.
-- Computed world coordinates using extrinsics.
+Estimated 6D poses from top planar surfaces.
+- Used known dimensions and orientation of planar patches
+- Identified if a patch is a top, front, or side face
+- Computed center and rotation matrix
+- Transformed from camera to world frame
 
-### Components
-- `notebooks/A4_estimate_box_pose.ipynb`
-- `BoxPoseEstimator` class implementation.
+Notebook: `notebooks/A4_estimate_box_pose.ipynb`
 
-### Result
-- Accurate 6D pose estimation in the world frame.
+![Pose Estimation](docs/imgs/rotation_estimation.png)
 
 ---
 
-## Pipeline Components
+## Pipeline Overview
 
-- `MaskedYOLODetector`: YOLO inference and mask filtering.
-- `PlanarPatchDetector`: Point cloud segmentation and patch detection.
-- `BoxPoseEstimator`: Pose estimation from patches and box class.
+Modular architecture:
+- `MaskedYOLODetector`: 2D detection with mask filtering
+- `PlanarPatchDetector`: 3D planar patch extraction
+- `BoxPoseEstimator`: computes 6D poses
 
-### Pipeline Diagram
+Pipeline diagram:
 ![Pipeline](docs/imgs/pipeline.png)
 
 ---
 
 ## ROS Integration
 
-### Commands
+ROS nodes prepared for real-time pipeline execution:
+
 ```bash
+# Terminal 1: ROS bag playback
 rosbag play <path_to_rosbag> --loop --clock
+
+# Terminal 2: Box detection
 roslaunch smart_palletizer box_detector.launch
+
+# Terminal 3: Planar patch node
 roslaunch smart_palletizer planar_patch_detector.launch
+
+# Terminal 4: Visualize
 rqt_image_view
 ```
 
@@ -90,20 +116,14 @@ rqt_image_view
 
 ## Documentation
 
-- Python docstrings used throughout the implementation.
-- Sphinx documentation generated under `docs/`.
-- Viewable locally with `make html`.
+All code is documented and compiled with Sphinx.
+
+To regenerate HTML docs:
+```bash
+cd docs
+make html SPHINXBUILD="python3 /opt/conda/envs/rosenv/bin/sphinx-build"
+```
+
+Output available in `docs/build/html/index.html`
 
 ---
-
-## Visual Examples
-
-### YOLO Detection:
-![YOLO Detection Output](docs/imgs/yolo_detection.png)
-
-### Planar Patches:
-![Planar Patch Detection 1](docs/imgs/planar1.png)
-![Planar Patch Detection 2](docs/imgs/planar2.png)
-
-### Pose Estimation:
-![Pose Estimation](docs/imgs/rotation_estimation.png)
