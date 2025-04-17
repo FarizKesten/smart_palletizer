@@ -126,4 +126,17 @@ make html SPHINXBUILD="python3 /opt/conda/envs/rosenv/bin/sphinx-build"
 
 Output available in `docs/build/html/index.html`
 
+## Code Overview:
+**notebooks/:** contain Jupyter notebooks for each step of the pipeline
+
+**lib/:** contains the main classes and functioons used both by the notebooks and the ROS nodes
+
+**src/scripts/:** contains the ROS nodes
+
+**data/backgrounds/:** contains the background images used to create the synthetic dataset
+
+**data/model:** contains the trained YOLOv8 model
+
+**data/dataset:** contains the synthetic dataset. (I was complenting of removing these images from the repo since they are quite large, but I figure you might want to have them for testing purposes)
+
 ---
