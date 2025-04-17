@@ -1,7 +1,0 @@
-<launch>
-  <node pkg="smart_palletizer" type="detect_boxes_node" name="box_detector_node" output="screen">
-    <param name="blur_kernel_size" value="5"/>
-    <param name="canny_thresh1" value="50"/>
-    <param name="canny_thresh2" value="150"/>
-  </node>
-</launch>
