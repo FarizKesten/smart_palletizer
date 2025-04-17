@@ -93,6 +93,16 @@ RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
 #     catkin_pkg empy
 
 
+# For Documentation
+RUN apt update && apt install -y \
+    texlive-latex-base texlive-fonts-recommended \
+    texlive-fonts-extra texlive-latex-extra latexmk \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY docs/requirements.txt /tmp/requirements.txt
+RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
+    -r /tmp/requirements.txt
+
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
