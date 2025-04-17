@@ -78,7 +78,7 @@ Example of synthetic training data:
   - Converting the dataset into YOLO format
   - Configuring and launching training with appropriate parameters
 
-The training procedure is detailed in:
+The training procedure is detailed in: (trained in Google Colab)
 `notebooks/A1_Train_YOLO_Model.ipynb`
 
 ---
