@@ -5,7 +5,19 @@ from ultralytics import YOLO
 
 
 class MaskedYOLODetector:
-    def __init__(self, color_image, depth_image, model_path, min_depth=1390, max_depth=1766):
+    def __init__(self, color_image, depth_image, model_path,
+                 min_depth=1390, max_depth=1766,
+                 min_box_area=10, max_box_area=10000):
+        """
+        Initialize the Masked YOLO Detector.
+        :param color_image: The color image (BGR format).
+        :param depth_image: The depth image (single channel).
+        :param model_path: Path to the YOLO model.
+        :param min_depth: Minimum depth for filtering out intersting  area
+        :param max_depth: Maximum depth for filtering out intersting area
+        :param min_box_area: Minimum area of the bounding box to consider
+        :param max_box_area: Maximum area of the bounding box to consider
+        """
         self.color_image = color_image
         self.depth_image = depth_image
         self.model = YOLO(model_path)
@@ -13,14 +25,24 @@ class MaskedYOLODetector:
         self.max_depth = max_depth
         self.mask = None
         self.filtered_boxes = []
-        self.min_box_area = 10
-        self.max_box_area = 10000
+        self.min_box_area = min_box_area
+        self.max_box_area = max_box_area
 
     def set_box_area(self, min_area, max_area):
+        """
+        Set the minimum and maximum area for the bounding boxes.
+        :param min_area: Minimum area of the bounding box to consider
+        :param max_area: Maximum area of the bounding box to consider
+        """
         self.min_box_area = min_area
         self.max_box_area = max_area
 
     def create_mask(self):
+        """
+        Create a mask based on the depth image to filter out regions of interest.
+        The mask is created by thresholding the depth image and applying morphological operations.
+        The largest connected component is retained as the mask.
+        """
         depth_mask = ((self.depth_image > self.min_depth) & (self.depth_image < self.max_depth)).astype(np.uint8) * 255
 
         if depth_mask.ndim == 3:
@@ -28,10 +50,12 @@ class MaskedYOLODetector:
         if depth_mask.shape != self.color_image.shape[:2]:
             depth_mask = cv.resize(depth_mask, (self.color_image.shape[1], self.color_image.shape[0]))
 
+        # Apply morphological operations to clean up the mask
         kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (30, 30))
         depth_mask = cv.morphologyEx(depth_mask, cv.MORPH_CLOSE, kernel)
         depth_mask = cv.dilate(depth_mask, kernel, iterations=1)
 
+        # Find the largest connected component
         num_labels, labels, stats, _ = cv.connectedComponentsWithStats(depth_mask, connectivity=8)
         largest_label = 1 + np.argmax(stats[1:, cv.CC_STAT_AREA])
         self.mask = (labels == largest_label).astype(np.uint8) * 255
@@ -60,6 +84,9 @@ class MaskedYOLODetector:
         plt.show()
 
     def run_detection(self, visualize=False):
+        """
+        Run the YOLO detection on the color image and filter the results based on the mask.
+        """
         results = self.model(self.color_image)
         result_img = self.color_image.copy()
         boxes = results[0].boxes
@@ -109,6 +136,10 @@ class MaskedYOLODetector:
         return self.filtered_boxes
 
     def print_box_details(self):
+        """
+        Print the detals of the filtered boxes
+        """
+
         print(f"Found {len(self.filtered_boxes)} boxes inside the mask:")
         for cls, conf, (x1, y1, x2, y2) in self.filtered_boxes:
             print(f"Class: {cls}, Confidence: {conf:.2f}, Box: ({x1}, {y1}, {x2}, {y2})")
