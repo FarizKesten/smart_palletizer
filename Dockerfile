@@ -11,9 +11,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y \
     ros-noetic-desktop-full \
     ros-noetic-pcl-ros \
+    ros-noetic-open3d-conversions \
     ros-noetic-pcl-conversions \
     ros-noetic-rviz \
     ros-noetic-gazebo-ros-pkgs \
+    ros-noetic-vision-msgs \
     ros-noetic-image-view \
     libpcl-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -44,6 +46,7 @@ RUN apt update && apt install -y \
     texlive-latex-extra \
     latexmk \
     x11-utils \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # try blenderproc
@@ -65,19 +68,30 @@ RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Minif
 # Set Conda in PATH and activate for all shells
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> /root/.bashrc
+RUN echo "export LD_PRELOAD=/opt/conda/envs/rosenv/lib/python3.8/site-packages/torch.libs/libgomp-804f19d4.so.1.0.0" >> /root/.bashrc
+RUN echo "source devel/setup.bash" >> /root/.bashrc
 
 # Create and activate Conda env
 RUN conda init bash && \
     conda create -n rosenv python=3.8 -y && \
     echo "conda activate rosenv" >> /root/.bashrc
 
+
 # Install Python packages in Conda env
 RUN /opt/conda/bin/conda run -n rosenv pip install --no-cache-dir \
     open3d dash werkzeug numpy pandas scikit-learn \
     opencv-python ipympl matplotlib tqdm \
     torch torchvision ultralytics \
-    notebook jupyterlab ipykernel albumentations
+    notebook jupyterlab ipykernel albumentations \
+    catkin_pkg empy
 
+# also install in base env just in case
+# RUN pip install --no-cache-dir \
+#     open3d dash werkzeug numpy pandas scikit-learn \
+#     opencv-python ipympl matplotlib tqdm \
+#     torch torchvision ultralytics \
+#     notebook jupyterlab ipykernel albumentations \
+#     catkin_pkg empy
 
 
 # Copy entrypoint script
