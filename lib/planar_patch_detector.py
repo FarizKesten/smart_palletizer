@@ -4,7 +4,20 @@ import matplotlib.pyplot as plt
 import cv2
 
 class PlanarPatchDetector:
+    """
+    Class to detect planar patches in a point cloud generated from a depth image.
+    Also implement some filtering to remove noise and outliers
+    """
     def __init__(self, color_img, depth_img, intrinsics, known_dims, depth_scale=1000.0, expand_ratio=0.1):
+        """
+        Initialize the PlanarPatchDetector.
+        :param color_img: Color image (BGR format).
+        :param depth_img: Depth image (single channel).
+        :param intrinsics: Camera intrinsics (fx, fy, cx, cy).
+        :param known_dims: Known dimensions of the boxes(small_box & medium_box) in the scene.
+        :param depth_scale: Scale factor for depth image
+        :param expand_ratio: Ratio to expand the bounding box around detected objects
+        """
         self.color_img = color_img
         self.depth_img = depth_img
         self.fx = intrinsics['fx']
@@ -87,6 +100,17 @@ class PlanarPatchDetector:
 
     def detect_planar_patches(self, pcd, normal_variance_threshold_deg=60, coplanarity_deg=60,
                               min_plane_edge_length=0.03, min_num_points=20, knn=50):
+        """
+        Detect planar patches in the point cloud
+        :param pcd: Point cloud to process
+        :param normal_variance_threshold_deg: Normal variance threshold in degrees
+        :param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)
+        :param min_plane_edge_length: Minimum edge length of the plane
+        :param min_num_points: Minimum number of points to consider a patch
+        :param knn: Number of nearest neighbors for the KDTree search
+        :return: List of detected planar patches
+        """
+
         return pcd.detect_planar_patches(
             normal_variance_threshold_deg=normal_variance_threshold_deg,
             coplanarity_deg=coplanarity_deg,
@@ -97,7 +121,13 @@ class PlanarPatchDetector:
 
 
     def fit_plane_to_points(self, pcd_points, distance_threshold=0.01):
-        """Fit a plane to the given points using RANSAC"""
+        """
+        Fit a plane to the given points using RANSAC
+        :param pcd_points: Point cloud to process
+        :param distance_threshold: Maximum distance from the plane to consider a point as an inlier
+        :return: Plane model coefficients [a, b, c, d] and inlier indices
+        """
+
         plane_model, inliers = pcd_points.segment_plane(distance_threshold=distance_threshold, ransac_n=3, num_iterations=1000)
         [a, b, c, d] = plane_model
 
@@ -111,7 +141,23 @@ class PlanarPatchDetector:
                     min_plane_edge_length=0.03, min_num_points=20, knn=50,
                     voxel_size=0.01, distance_threshold=0.01, nb_neighbors=50, std_ratio=2.0,
                     min_plane_area=0.1):  # Add the min_plane_area parameter
-        """Run the full pipeline per detection and visualize on the full corrected point cloud."""
+        """
+        Run the full pipeline per detection and visualize on the full corrected point cloud.
+        :param visualize: Whether to visualize the results
+        :param visualize_individual: Whether to visualize individual patches
+        :param mode: Visualization mode ('2d' or '3d')
+        :param normal_variance_threshold_deg: Normal variance threshold in degrees
+        :param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)
+        :param min_plane_edge_length: Minimum edge length of the plane
+        :param min_num_points: Minimum number of points to consider a patch
+        :param knn: Number of nearest neighbors for the KDTree search
+        :param voxel_size: Voxel size for downsampling
+        :param distance_threshold: Maximum distance from the plane to consider a point as an inlier
+        :param nb_neighbors: Number of neighbors for statistical outlier removal
+        :param std_ratio: Standard deviation ratio for statistical outlier removal
+        :param min_plane_area: Minimum area of the plane to consider it valid
+        """
+
         self.per_box_pcds = []
         self.per_box_patches = []
         all_patches = []
@@ -138,7 +184,7 @@ class PlanarPatchDetector:
             filtered_points = self.filter_points_on_plane(inlier_points, plane_model, threshold=distance_threshold)
 
             # Store the cleaned point cloud for this detection
-            self.cleaned_box_surfaces.append(filtered_points)
+            self.cleaned_box_surfaces.append({"class": cls, "points" : filtered_points})
 
 
             patches = self.detect_planar_patches(
@@ -204,8 +250,35 @@ class PlanarPatchDetector:
                 if visualize:
                     self.visualize_all([self.full_scene_pcd] + all_patches)
 
+    def visualize_overlay_top(self, return_image=False):
+        """
+        Return a 2D overlay image of the top patches drawn over the depth map
+        :param return_image: If True, return the overlay image instead of displaying it
+        :return: Overlay image
+        """
+        depth_norm = (self.depth_img / np.max(self.depth_img) * 255).astype(np.uint8)
+        overlay = np.stack([depth_norm] * 3, axis=-1)
+
+        for patch_list in self.per_box_patches:
+            if patch_list:
+                patch = patch_list[0]  # assume first is best
+                corners_2d = self.project_patch_to_image(patch)
+                if len(corners_2d) >= 3:
+                    cv2.polylines(overlay, [np.array(corners_2d)], True, (0, 0, 255), 2)
+
+        return overlay if return_image else cv2.imshow("Overlay Top Patches", overlay)
 
     def visualize_patch_overlay(self, pcd_unused, patches, colors, box_index, cls, mode='3d'):
+        """
+        Visualize the patches in 2D or 3D based on the mode.
+        :param pcd_unused: Unused parameter, can be removed if not needed
+        :param patches: List of patches to visualize
+        :param colors: List of colors for the patches
+        :param box_index: Index of the bounding box
+        :param cls: Class of the detected object
+        :param mode: Visualization mode ('2d' or '3d')
+        """
+
         # Visualize patches in 2D or 3D based on mode
         if mode == '2d':
             self.visualize_2d(patches, box_index, cls)
@@ -213,7 +286,13 @@ class PlanarPatchDetector:
             self.visualize_3d(patches, colors, box_index, cls)
 
     def visualize_2d(self, patches, box_index, cls):
-        """Visualize patches in 2D on the image"""
+        """
+        Visualize patches in 2D on the image
+        :param patches: List of patches to visualize
+        :param box_index: Index of the bounding box
+        :param cls: Class of the detected object
+        """
+
         depth_norm = (self.depth_img / np.max(self.depth_img) * 255).astype(np.uint8)
         overlay = np.stack([depth_norm]*3, axis=-1)
 
@@ -244,7 +323,14 @@ class PlanarPatchDetector:
         plt.show()
 
     def visualize_3d(self, patches, colors, box_index, cls):
-        """Visualize patches in 3D"""
+        """
+        Visualize patches in 3D
+        :param patches: List of patches to visualize
+        :param colors: List of colors for the patches
+        :param box_index: Index of the bounding box
+        :param cls: Class of the detected object
+        """
+
         geometries = []
         pcd = self.full_scene_pcd
         geometries.append(pcd)
@@ -265,6 +351,12 @@ class PlanarPatchDetector:
 
 
     def colorize_pointcloud_from_image(self, pcd):
+        """
+        Colorize the point cloud using the color image.
+        :param pcd: Point cloud to colorize
+        :return: Colorized point cloud
+        """
+
         fx, fy, cx, cy = self.fx, self.fy, self.cx, self.cy
         img_h, img_w = self.color_img.shape[:2]
 
@@ -308,7 +400,8 @@ class PlanarPatchDetector:
         Visualize all cleaned and colorized planar surfaces.
         """
         geometries = []
-        for surface in self.cleaned_box_surfaces:
+        for surface_result in self.cleaned_box_surfaces:
+            surface = surface_result["points"]
             colored = self.colorize_pointcloud_from_image(surface)
             geometries.append(colored)
             # mesh = self.pointcloud_to_surface_mesh(surface)
@@ -322,8 +415,72 @@ class PlanarPatchDetector:
         # o3d.visualization.draw_geometries(geometries, window_name="Surface Meshes")
 
 
+    def visualize_full_2d(self):
+        """
+        Return a 2D overlay image of all patches drawn over the depth map.
+        """
+        depth_norm = (self.depth_img / np.max(self.depth_img) * 255).astype(np.uint8)
+        overlay = np.stack([depth_norm]*3, axis=-1)
+
+        all_patches = []
+        for patch_list in self.per_box_patches:
+            all_patches.extend(patch_list)
+
+        if not all_patches:
+            print("No patches to visualize.")
+            return None
+
+        color_map = plt.cm.get_cmap("Set1", len(all_patches))
+        for k, patch in enumerate(all_patches):
+            corners_3d = np.asarray(patch.get_box_points())
+            corners_2d = []
+
+            for pt in corners_3d:
+                if pt[2] <= 0:
+                    continue
+                u = int((pt[0] * self.fx) / pt[2] + self.cx)
+                v = int((pt[1] * self.fy) / pt[2] + self.cy)
+                if 0 <= u < overlay.shape[1] and 0 <= v < overlay.shape[0]:
+                    corners_2d.append((u, v))
+            if len(corners_2d) >= 4:
+                corners_2d = np.array(corners_2d, dtype=np.int32)
+                hull = cv2.convexHull(corners_2d)
+                color = tuple(int(c * 255) for c in color_map(k)[:3])
+                cv2.fillPoly(overlay, [hull], color=color)
+                cv2.polylines(overlay, [hull], isClosed=True, color=(0, 0, 0), thickness=2)
+
+        return overlay
+
+
+    def get_full_scene_pcd(self):
+        return self.full_scene_pcd
+
     def get_results(self):
         return list(zip(self.per_box_pcds, self.per_box_patches))
 
     def get_cleaned_surfaces(self):
         return self.cleaned_box_surfaces
+
+    def get_combined_plane_points(self):
+        """
+        Return all cleaned surface inlier points as a single list of 3D points (for PointCloud2 publishing in ROS)
+        """
+
+        all_points = []
+        for surface in self.cleaned_box_surfaces:
+            pcd = surface["points"]
+            np_points = np.asarray(pcd.points)
+            all_points.extend(np_points.tolist())
+        return all_points
+
+    def get_top_patch_points(self):
+        """
+        Return point clouds of top selected planar patches (those visualized in 3D)
+        """
+
+        top_points = []
+        for patches in self.per_box_patches:
+            for patch in patches:
+                points = np.asarray(patch.get_box_points())  # Or use `patch.sample_points_poisson_disk()`
+                top_points.extend(points.tolist())
+        return top_points
