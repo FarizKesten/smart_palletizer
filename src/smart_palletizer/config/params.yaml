@@ -1,0 +1,26 @@
+# === File: params.yaml ===
+# Configuration parameters for the Smart Palletizer ROS node.
+
+# === Paths ===
+intrinsics_path: "/workspace/data/small_box/intrinsics.json"  # Path to camera intrinsics file
+extrinsics_path: "/workspace/data/small_box/cam2root.json"     # Path to camera-to-world transform
+model_path: "/workspace/data/small_box/model.ply"              # Path to 3D model used for visualization or comparison
+
+# === Box Dimensions (in meters) ===
+known_dims:
+  small_box: [0.340, 0.250, 0.095]   # [length, width, height]
+  medium_box: [0.255, 0.155, 0.100]  # [length, width, height]
+
+# === Planar Patch Detector Settings ===
+normal_variance_threshold_deg: 60     # Max allowed normal variance within a patch (in degrees)
+coplanarity_deg: 60                   # Max angle between normals to consider patches coplanar
+min_plane_edge_length: 0.03           # Minimum edge length of detected plane (in meters)
+min_num_points: 20                    # Minimum number of points to fit a plane
+knn: 50                               # Number of nearest neighbors to consider in normal estimation
+
+# === Point Cloud Filtering ===
+voxel_size: 0.01                      # Voxel size for downsampling (in meters)
+distance_threshold: 0.005             # Max distance from plane for RANSAC inliers (in meters)
+nb_neighbors: 30                      # Number of neighbors for statistical outlier removal
+std_ratio: 1.5                        # Standard deviation multiplier for filtering
+min_plane_area: 0.00003               # Minimum area (in m²) for keeping a planar patch

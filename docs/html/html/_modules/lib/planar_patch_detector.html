@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.planar_patch_detector &mdash; neurapy_ai_utils 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/neura_logo.svg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> neurapy_ai_utils
+            <img src="../../_static/logo.jpg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../box_detector_node.html">box_detector_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planar_patch_node.html">planar_patch_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib.html">lib package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">neurapy_ai_utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.planar_patch_detector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.planar_patch_detector</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<div class="viewcode-block" id="PlanarPatchDetector"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector">[docs]</a><span class="k">class</span> <span class="nc">PlanarPatchDetector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to detect planar patches in a point cloud generated from a depth image.</span>
+<span class="sd">    Also implement some filtering to remove noise and outliers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_img</span><span class="p">,</span> <span class="n">depth_img</span><span class="p">,</span> <span class="n">intrinsics</span><span class="p">,</span> <span class="n">known_dims</span><span class="p">,</span> <span class="n">depth_scale</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span> <span class="n">expand_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the PlanarPatchDetector.</span>
+<span class="sd">        :param color_img: Color image (BGR format).</span>
+<span class="sd">        :param depth_img: Depth image (single channel).</span>
+<span class="sd">        :param intrinsics: Camera intrinsics (fx, fy, cx, cy).</span>
+<span class="sd">        :param known_dims: Known dimensions of the boxes(small_box &amp; medium_box) in the scene.</span>
+<span class="sd">        :param depth_scale: Scale factor for depth image</span>
+<span class="sd">        :param expand_ratio: Ratio to expand the bounding box around detected objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_img</span> <span class="o">=</span> <span class="n">color_img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span> <span class="o">=</span> <span class="n">depth_img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fx</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;fx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fy</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;fy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;cx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;cy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth_scale</span> <span class="o">=</span> <span class="n">depth_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio</span> <span class="o">=</span> <span class="n">expand_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_dims</span> <span class="o">=</span> <span class="n">known_dims</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">detections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_box_pcds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_box_surfaces</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Full scene point cloud without correction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">full_scene_pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_full_pointcloud</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PlanarPatchDetector.voxel_downsampling"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.voxel_downsampling">[docs]</a>    <span class="k">def</span> <span class="nf">voxel_downsampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Downsample the point cloud using a voxel grid filter.&quot;&quot;&quot;</span>
+        <span class="n">pcd_downsampled</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">voxel_down_sample</span><span class="p">(</span><span class="n">voxel_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pcd_downsampled</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.create_full_pointcloud"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.create_full_pointcloud">[docs]</a>    <span class="k">def</span> <span class="nf">create_full_pointcloud</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts every pixel in the depth image to a 3D point using a pinhole camera model&quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_scale</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">h</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_non_finite_points</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.pointcloud_to_surface_mesh"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.pointcloud_to_surface_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">pointcloud_to_surface_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a dense point cloud into a surface mesh using Poisson reconstruction.</span>
+<span class="sd">        Works best if the point cloud represents a flat or smooth surface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">estimate_normals</span><span class="p">(</span><span class="n">search_param</span><span class="o">=</span><span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">KDTreeSearchParamHybrid</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">max_nn</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+        <span class="n">mesh</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">TriangleMesh</span><span class="o">.</span><span class="n">create_from_point_cloud_poisson</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mesh</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.set_yolo_detections"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.set_yolo_detections">[docs]</a>    <span class="k">def</span> <span class="nf">set_yolo_detections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detections</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Detections format: list of (class, conf, (x1, y1, x2, y2))&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detections</span> <span class="o">=</span> <span class="n">detections</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.expand_bbox"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.expand_bbox">[docs]</a>    <span class="k">def</span> <span class="nf">expand_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extend the area of bbox&quot;&quot;&quot;</span>
+        <span class="n">dh</span><span class="p">,</span> <span class="n">dw</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio</span><span class="p">)</span>
+        <span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">x_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">dw</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">y_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">dh</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">x2_new</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">w</span> <span class="o">+</span> <span class="n">dw</span><span class="p">,</span> <span class="n">img_w</span><span class="p">)</span>
+        <span class="n">y2_new</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">h</span> <span class="o">+</span> <span class="n">dh</span><span class="p">,</span> <span class="n">img_h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">y_new</span><span class="p">,</span> <span class="n">x2_new</span> <span class="o">-</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">y2_new</span> <span class="o">-</span> <span class="n">y_new</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.crop_pointcloud_from_bbox"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.crop_pointcloud_from_bbox">[docs]</a>    <span class="k">def</span> <span class="nf">crop_pointcloud_from_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts the cropped image region to a point cloud&quot;&quot;&quot;</span>
+        <span class="n">depth_crop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="p">[</span><span class="n">y</span><span class="p">:</span><span class="n">y</span><span class="o">+</span><span class="n">h</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">w</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_scale</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">depth_crop</span>
+        <span class="n">x3d</span> <span class="o">=</span> <span class="p">(</span><span class="n">cols</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span>
+        <span class="n">y3d</span> <span class="o">=</span> <span class="p">(</span><span class="n">rows</span> <span class="o">+</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">x3d</span><span class="p">,</span> <span class="n">y3d</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_non_finite_points</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.compute_normals"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.compute_normals">[docs]</a>    <span class="k">def</span> <span class="nf">compute_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute normals from the points&quot;&quot;&quot;</span>
+        <span class="n">pcd</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_statistical_outlier</span><span class="p">(</span><span class="n">nb_neighbors</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">std_ratio</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">300</span><span class="p">:</span>
+            <span class="n">pcd</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_radius_outlier</span><span class="p">(</span><span class="n">nb_points</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">estimate_normals</span><span class="p">(</span><span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">KDTreeSearchParamHybrid</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">max_nn</span><span class="o">=</span><span class="mi">50</span><span class="p">))</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">orient_normals_to_align_with_direction</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">pcd</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.detect_planar_patches"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.detect_planar_patches">[docs]</a>    <span class="k">def</span> <span class="nf">detect_planar_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">,</span> <span class="n">normal_variance_threshold_deg</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">coplanarity_deg</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                              <span class="n">min_plane_edge_length</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">min_num_points</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect planar patches in the point cloud</span>
+<span class="sd">        :param pcd: Point cloud to process</span>
+<span class="sd">        :param normal_variance_threshold_deg: Normal variance threshold in degrees</span>
+<span class="sd">        :param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)</span>
+<span class="sd">        :param min_plane_edge_length: Minimum edge length of the plane</span>
+<span class="sd">        :param min_num_points: Minimum number of points to consider a patch</span>
+<span class="sd">        :param knn: Number of nearest neighbors for the KDTree search</span>
+<span class="sd">        :return: List of detected planar patches</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">pcd</span><span class="o">.</span><span class="n">detect_planar_patches</span><span class="p">(</span>
+            <span class="n">normal_variance_threshold_deg</span><span class="o">=</span><span class="n">normal_variance_threshold_deg</span><span class="p">,</span>
+            <span class="n">coplanarity_deg</span><span class="o">=</span><span class="n">coplanarity_deg</span><span class="p">,</span>
+            <span class="n">min_plane_edge_length</span><span class="o">=</span><span class="n">min_plane_edge_length</span><span class="p">,</span>
+            <span class="n">min_num_points</span><span class="o">=</span><span class="n">min_num_points</span><span class="p">,</span>
+            <span class="n">search_param</span><span class="o">=</span><span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">KDTreeSearchParamKNN</span><span class="p">(</span><span class="n">knn</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlanarPatchDetector.fit_plane_to_points"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.fit_plane_to_points">[docs]</a>    <span class="k">def</span> <span class="nf">fit_plane_to_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd_points</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit a plane to the given points using RANSAC</span>
+<span class="sd">        :param pcd_points: Point cloud to process</span>
+<span class="sd">        :param distance_threshold: Maximum distance from the plane to consider a point as an inlier</span>
+<span class="sd">        :return: Plane model coefficients [a, b, c, d] and inlier indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">plane_model</span><span class="p">,</span> <span class="n">inliers</span> <span class="o">=</span> <span class="n">pcd_points</span><span class="o">.</span><span class="n">segment_plane</span><span class="p">(</span><span class="n">distance_threshold</span><span class="o">=</span><span class="n">distance_threshold</span><span class="p">,</span> <span class="n">ransac_n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">plane_model</span>
+
+        <span class="c1"># Extract the inlier points</span>
+        <span class="n">inlier_points</span> <span class="o">=</span> <span class="n">pcd_points</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="n">inliers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inlier_points</span><span class="p">,</span> <span class="n">plane_model</span></div>
+
+
+<div class="viewcode-block" id="PlanarPatchDetector.process_all"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.process_all">[docs]</a>    <span class="k">def</span> <span class="nf">process_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">visualize_individual</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span>
+                    <span class="n">normal_variance_threshold_deg</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">coplanarity_deg</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                    <span class="n">min_plane_edge_length</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">min_num_points</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                    <span class="n">voxel_size</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">nb_neighbors</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">std_ratio</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                    <span class="n">min_plane_area</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>  <span class="c1"># Add the min_plane_area parameter</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the full pipeline per detection and visualize on the full corrected point cloud.</span>
+<span class="sd">        :param visualize: Whether to visualize the results</span>
+<span class="sd">        :param visualize_individual: Whether to visualize individual patches</span>
+<span class="sd">        :param mode: Visualization mode (&#39;2d&#39; or &#39;3d&#39;)</span>
+<span class="sd">        :param normal_variance_threshold_deg: Normal variance threshold in degrees</span>
+<span class="sd">        :param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)</span>
+<span class="sd">        :param min_plane_edge_length: Minimum edge length of the plane</span>
+<span class="sd">        :param min_num_points: Minimum number of points to consider a patch</span>
+<span class="sd">        :param knn: Number of nearest neighbors for the KDTree search</span>
+<span class="sd">        :param voxel_size: Voxel size for downsampling</span>
+<span class="sd">        :param distance_threshold: Maximum distance from the plane to consider a point as an inlier</span>
+<span class="sd">        :param nb_neighbors: Number of neighbors for statistical outlier removal</span>
+<span class="sd">        :param std_ratio: Standard deviation ratio for statistical outlier removal</span>
+<span class="sd">        :param min_plane_area: Minimum area of the plane to consider it valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_box_pcds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_patches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detections</span><span class="p">):</span>
+            <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+            <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span>
+            <span class="n">x_exp</span><span class="p">,</span> <span class="n">y_exp</span><span class="p">,</span> <span class="n">w_exp</span><span class="p">,</span> <span class="n">h_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_bbox</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="n">x_exp</span><span class="p">,</span> <span class="n">y_exp</span><span class="p">,</span> <span class="n">w_exp</span><span class="p">,</span> <span class="n">h_exp</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">(</span><span class="n">x_exp</span><span class="p">,</span> <span class="n">y_exp</span><span class="p">,</span> <span class="n">w_exp</span><span class="p">,</span> <span class="n">h_exp</span><span class="p">))</span>
+
+            <span class="n">pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_pointcloud_from_bbox</span><span class="p">(</span><span class="n">x_exp</span><span class="p">,</span> <span class="n">y_exp</span><span class="p">,</span> <span class="n">w_exp</span><span class="p">,</span> <span class="n">h_exp</span><span class="p">)</span>
+            <span class="n">pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_normals</span><span class="p">(</span><span class="n">pcd</span><span class="p">)</span>
+
+            <span class="c1"># Apply voxel downsampling to reduce points and noise</span>
+            <span class="n">pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_downsampling</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span><span class="p">)</span>
+
+            <span class="c1"># Apply statistical outlier removal for additional noise reduction</span>
+            <span class="n">pcd</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_statistical_outlier</span><span class="p">(</span><span class="n">nb_neighbors</span><span class="o">=</span><span class="n">nb_neighbors</span><span class="p">,</span> <span class="n">std_ratio</span><span class="o">=</span><span class="n">std_ratio</span><span class="p">)</span>
+
+            <span class="c1"># Fit a plane to the points and extract inliers</span>
+            <span class="n">inlier_points</span><span class="p">,</span> <span class="n">plane_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_plane_to_points</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="n">distance_threshold</span><span class="p">)</span>
+
+            <span class="c1"># Optional stricter filtering after RANSAC</span>
+            <span class="n">filtered_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_points_on_plane</span><span class="p">(</span><span class="n">inlier_points</span><span class="p">,</span> <span class="n">plane_model</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">distance_threshold</span><span class="p">)</span>
+
+            <span class="c1"># Store the cleaned point cloud for this detection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_box_surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;points&quot;</span> <span class="p">:</span> <span class="n">filtered_points</span><span class="p">})</span>
+
+
+            <span class="n">patches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_planar_patches</span><span class="p">(</span>
+                <span class="n">pcd</span><span class="p">,</span>
+                <span class="n">normal_variance_threshold_deg</span><span class="o">=</span><span class="n">normal_variance_threshold_deg</span><span class="p">,</span>
+                <span class="n">coplanarity_deg</span><span class="o">=</span><span class="n">coplanarity_deg</span><span class="p">,</span>
+                <span class="n">min_plane_edge_length</span><span class="o">=</span><span class="n">min_plane_edge_length</span><span class="p">,</span>
+                <span class="n">min_num_points</span><span class="o">=</span><span class="n">min_num_points</span><span class="p">,</span>
+                <span class="n">knn</span><span class="o">=</span><span class="n">knn</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">per_box_pcds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pcd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Detection </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> (class: </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">) - found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span><span class="si">}</span><span class="s2"> planar patches&quot;</span><span class="p">)</span>
+
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;Set1&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">colors</span>  <span class="c1"># Use high-contrast color map</span>
+
+            <span class="n">patch_normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">patch</span><span class="o">.</span><span class="n">R</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">patches</span><span class="p">]</span>
+            <span class="n">dot_products</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">normal</span> <span class="ow">in</span> <span class="n">patch_normals</span><span class="p">]</span>
+
+            <span class="n">expected_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+            <span class="n">expected_area</span> <span class="o">=</span> <span class="n">expected_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">expected_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">patch_scores</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">dp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dot_products</span><span class="p">):</span>  <span class="c1"># enhanced scoring with size prior</span>
+                <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">normal_alignment_score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">dp</span>  <span class="c1"># how close the normal is to being vertical</span>
+                <span class="n">inlier_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">get_point_indices_within_bounding_box</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">get_box_points</span><span class="p">()))</span>
+                <span class="n">patch_extent</span> <span class="o">=</span> <span class="n">patch</span><span class="o">.</span><span class="n">extent</span>
+                <span class="n">patch_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">patch_extent</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+                <span class="n">area_score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">patch_area</span> <span class="o">-</span> <span class="n">expected_area</span><span class="p">)</span> <span class="o">/</span> <span class="n">expected_area</span>
+                <span class="n">patch_scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">normal_alignment_score</span> <span class="o">+</span> <span class="n">area_score</span><span class="p">,</span> <span class="n">inlier_count</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">inliers</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">patch_normals</span><span class="p">,</span> <span class="n">patch_scores</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   - Patch </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: normal=</span><span class="si">{</span><span class="n">normal</span><span class="si">}</span><span class="s2">, alignment_score=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, inliers=</span><span class="si">{</span><span class="n">inliers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">patches</span><span class="p">:</span>
+                <span class="c1"># Apply area filtering: remove patches smaller than the minimum area threshold</span>
+                <span class="n">patches</span> <span class="o">=</span> <span class="p">[</span><span class="n">patch</span> <span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">patches</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">extent</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_plane_area</span><span class="p">]</span>
+
+                <span class="c1"># Ensure we have patches left after filtering</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Keep only the best patches based on size and flatness</span>
+                    <span class="n">top_patch_indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="p">(</span><span class="n">patch_scores</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">patch_scores</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                    <span class="c1"># Ensure top_patch_indices doesn&#39;t exceed the number of available patches</span>
+                    <span class="n">top_patch_indices</span> <span class="o">=</span> <span class="n">top_patch_indices</span><span class="p">[:</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">))]</span>  <span class="c1"># Limit to 3 patches or less</span>
+
+                    <span class="c1"># Process the selected patches</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">top_patch_indices</span><span class="p">:</span>
+                            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                            <span class="n">patch</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">j</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)][:</span><span class="mi">3</span><span class="p">])</span>  <span class="c1"># Assign color to patch</span>
+                            <span class="n">all_patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid patches left after filtering (small planes).&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Visualize individual patches if required</span>
+                <span class="k">if</span> <span class="n">visualize_individual</span> <span class="ow">and</span> <span class="n">patches</span><span class="p">:</span>
+                    <span class="n">top_patches</span> <span class="o">=</span> <span class="p">[</span><span class="n">patches</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">top_patch_indices</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">)]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">visualize_patch_overlay</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">top_patches</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+
+                <span class="k">if</span> <span class="n">visualize</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">visualize_all</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">full_scene_pcd</span><span class="p">]</span> <span class="o">+</span> <span class="n">all_patches</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_overlay_top"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_overlay_top">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_overlay_top</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_image</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a 2D overlay image of the top patches drawn over the depth map</span>
+<span class="sd">        :param return_image: If True, return the overlay image instead of displaying it</span>
+<span class="sd">        :return: Overlay image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">depth_norm</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">overlay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">depth_norm</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">patch_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">patch_list</span><span class="p">:</span>
+                <span class="n">patch</span> <span class="o">=</span> <span class="n">patch_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># assume first is best</span>
+                <span class="n">corners_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_patch_to_image</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)],</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">overlay</span> <span class="k">if</span> <span class="n">return_image</span> <span class="k">else</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Overlay Top Patches&quot;</span><span class="p">,</span> <span class="n">overlay</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_patch_overlay"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_patch_overlay">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_patch_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd_unused</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">box_index</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize the patches in 2D or 3D based on the mode.</span>
+<span class="sd">        :param pcd_unused: Unused parameter, can be removed if not needed</span>
+<span class="sd">        :param patches: List of patches to visualize</span>
+<span class="sd">        :param colors: List of colors for the patches</span>
+<span class="sd">        :param box_index: Index of the bounding box</span>
+<span class="sd">        :param cls: Class of the detected object</span>
+<span class="sd">        :param mode: Visualization mode (&#39;2d&#39; or &#39;3d&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Visualize patches in 2D or 3D based on mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;2d&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_2d</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">box_index</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualize_3d</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">box_index</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_2d"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_2d">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">box_index</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize patches in 2D on the image</span>
+<span class="sd">        :param patches: List of patches to visualize</span>
+<span class="sd">        :param box_index: Index of the bounding box</span>
+<span class="sd">        :param cls: Class of the detected object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">depth_norm</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">overlay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">depth_norm</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">color_map</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;Set1&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">patch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">patches</span><span class="p">):</span>
+            <span class="n">corners_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">get_box_points</span><span class="p">())</span>
+            <span class="n">corners_2d</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">corners_3d</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">corners_2d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">corners_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="n">hull</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">convexHull</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color_map</span><span class="p">(</span><span class="n">k</span><span class="p">)[:</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="p">[</span><span class="n">hull</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="p">[</span><span class="n">hull</span><span class="p">],</span> <span class="n">isClosed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Display the 2D overlay using matplotlib</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detection </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>  <span class="c1"># Turn off axis labels</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_3d"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_3d">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">box_index</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize patches in 3D</span>
+<span class="sd">        :param patches: List of patches to visualize</span>
+<span class="sd">        :param colors: List of colors for the patches</span>
+<span class="sd">        :param box_index: Index of the bounding box</span>
+<span class="sd">        :param cls: Class of the detected object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_scene_pcd</span>
+        <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pcd</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">patch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">patches</span><span class="p">):</span>
+            <span class="n">mesh_box</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">LineSet</span><span class="o">.</span><span class="n">create_from_oriented_bounding_box</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+            <span class="n">mesh_box</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">k</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)][:</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh_box</span><span class="p">)</span>
+
+        <span class="n">coord</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">TriangleMesh</span><span class="o">.</span><span class="n">create_coordinate_frame</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">(</span>
+            <span class="n">geometries</span><span class="p">,</span>
+            <span class="n">window_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Detection </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mi">600</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlanarPatchDetector.colorize_pointcloud_from_image"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.colorize_pointcloud_from_image">[docs]</a>    <span class="k">def</span> <span class="nf">colorize_pointcloud_from_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Colorize the point cloud using the color image.</span>
+<span class="sd">        :param pcd: Point cloud to colorize</span>
+<span class="sd">        :return: Colorized point cloud</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span>
+        <span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="k">continue</span>
+
+            <span class="n">u</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fx</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">cx</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">fy</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">cy</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">img_w</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">img_h</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_img</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="mf">255.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+
+        <span class="n">pcd</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pcd</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.filter_points_on_plane"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.filter_points_on_plane">[docs]</a>    <span class="k">def</span> <span class="nf">filter_points_on_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">,</span> <span class="n">plane_model</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.005</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter points from the point cloud that are within a distance to the plane.</span>
+<span class="sd">        plane_model: [a, b, c, d] from ax + by + cz + d = 0</span>
+<span class="sd">        threshold: max distance in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">plane_model</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">distances</span> <span class="o">&lt;</span> <span class="n">threshold</span>
+        <span class="n">filtered_pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+        <span class="n">filtered_pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">filtered_pcd</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_colored_surfaces"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_colored_surfaces">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_colored_surfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize all cleaned and colorized planar surfaces.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">surface_result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_box_surfaces</span><span class="p">:</span>
+            <span class="n">surface</span> <span class="o">=</span> <span class="n">surface_result</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span>
+            <span class="n">colored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorize_pointcloud_from_image</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+            <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colored</span><span class="p">)</span>
+            <span class="c1"># mesh = self.pointcloud_to_surface_mesh(surface)</span>
+            <span class="c1"># mesh.paint_uniform_color([0.6, 0.8, 1.0])  # Light blue for visibility</span>
+            <span class="c1"># geometries.append(mesh)</span>
+
+        <span class="n">coord</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">TriangleMesh</span><span class="o">.</span><span class="n">create_coordinate_frame</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;Cleaned Colored Surfaces&quot;</span><span class="p">)</span></div>
+        <span class="c1"># o3d.visualization.draw_geometries(geometries, window_name=&quot;Surface Meshes&quot;)</span>
+
+
+<div class="viewcode-block" id="PlanarPatchDetector.visualize_full_2d"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.visualize_full_2d">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_full_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a 2D overlay image of all patches drawn over the depth map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">depth_norm</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth_img</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">overlay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">depth_norm</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">all_patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">patch_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span><span class="p">:</span>
+            <span class="n">all_patches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">patch_list</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_patches</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No patches to visualize.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">color_map</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;Set1&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_patches</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">patch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_patches</span><span class="p">):</span>
+            <span class="n">corners_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">get_box_points</span><span class="p">())</span>
+            <span class="n">corners_2d</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">corners_3d</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cx</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cy</span><span class="p">)</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">corners_2d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">corners_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="n">hull</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">convexHull</span><span class="p">(</span><span class="n">corners_2d</span><span class="p">)</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">color_map</span><span class="p">(</span><span class="n">k</span><span class="p">)[:</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="p">[</span><span class="n">hull</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="p">[</span><span class="n">hull</span><span class="p">],</span> <span class="n">isClosed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">overlay</span></div>
+
+
+<div class="viewcode-block" id="PlanarPatchDetector.get_full_scene_pcd"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.get_full_scene_pcd">[docs]</a>    <span class="k">def</span> <span class="nf">get_full_scene_pcd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_scene_pcd</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.get_results"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.get_results">[docs]</a>    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">per_box_pcds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.get_cleaned_surfaces"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.get_cleaned_surfaces">[docs]</a>    <span class="k">def</span> <span class="nf">get_cleaned_surfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_box_surfaces</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.get_combined_plane_points"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.get_combined_plane_points">[docs]</a>    <span class="k">def</span> <span class="nf">get_combined_plane_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return all cleaned surface inlier points as a single list of 3D points (for PointCloud2 publishing in ROS)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">surface</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_box_surfaces</span><span class="p">:</span>
+            <span class="n">pcd</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s2">&quot;points&quot;</span><span class="p">]</span>
+            <span class="n">np_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">all_points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np_points</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">all_points</span></div>
+
+<div class="viewcode-block" id="PlanarPatchDetector.get_top_patch_points"><a class="viewcode-back" href="../../lib.html#lib.planar_patch_detector.PlanarPatchDetector.get_top_patch_points">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_patch_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return point clouds of top selected planar patches (those visualized in 3D)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">top_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">patches</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_box_patches</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">patch</span> <span class="ow">in</span> <span class="n">patches</span><span class="p">:</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">get_box_points</span><span class="p">())</span>  <span class="c1"># Or use `patch.sample_points_poisson_disk()`</span>
+                <span class="n">top_points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">top_points</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Neura Robotics GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

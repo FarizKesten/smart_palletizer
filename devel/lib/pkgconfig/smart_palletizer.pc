@@ -2,7 +2,7 @@ prefix=/workspace/devel
 
 Name: smart_palletizer
 Description: Description of smart_palletizer
-Version: 0.0.1
+Version: 0.0.0
 Cflags: 
 Libs: -L${prefix}/lib 
 Requires: 

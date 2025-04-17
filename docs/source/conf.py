@@ -10,6 +10,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import os
+import sys
+
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+
+sys.path.insert(0, os.path.abspath('../../'))  # root dir
+sys.path.insert(0, os.path.abspath('../../lib'))  # for lib/*.py
+sys.path.insert(0, os.path.abspath('../../src/smart_palletizer/scripts'))  # for nodes
 
 import subprocess
 from pbr.version import VersionInfo
@@ -27,7 +36,7 @@ def get_git_short_hash():
         return rc
     except subprocess.CalledProcessError:
         return "unknown"
-    
+
 # -- Project information -----------------------------------------------------
 
 project = "neurapy_ai_utils"
@@ -49,9 +58,10 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx_mdinclude'
 ]
+autosummary_generate = True
 
 templates_path = ['_templates']
-exclude_patterns = [    
+exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",

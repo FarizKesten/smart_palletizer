@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.box_pose_estimator &mdash; neurapy_ai_utils 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/neura_logo.svg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> neurapy_ai_utils
+            <img src="../../_static/logo.jpg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../box_detector_node.html">box_detector_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planar_patch_node.html">planar_patch_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib.html">lib package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">neurapy_ai_utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.box_pose_estimator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.box_pose_estimator</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="BoxPoseEstimator"><a class="viewcode-back" href="../../lib.html#lib.box_pose_estimator.BoxPoseEstimator">[docs]</a><span></span><span class="k">class</span> <span class="nc">BoxPoseEstimator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimates 6D pose of boxes based on planar patches from point clouds.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        fx (float): Focal length in x.</span>
+<span class="sd">        fy (float): Focal length in y.</span>
+<span class="sd">        cx (float): Optical center x.</span>
+<span class="sd">        cy (float): Optical center y.</span>
+<span class="sd">        extrinsics (np.ndarray): 4x4 transformation matrix from camera to world.</span>
+<span class="sd">        known_dims (dict): Dictionary mapping class names to (x, y, z) box dimensions.</span>
+<span class="sd">        poses_world (list): List of dictionaries with estimated poses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intrinsics</span><span class="p">,</span> <span class="n">extrinsics</span><span class="p">,</span> <span class="n">known_dims</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize BoxPoseEstimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            intrinsics (dict): Dictionary with keys &#39;fx&#39;, &#39;fy&#39;, &#39;cx&#39;, &#39;cy&#39;.</span>
+<span class="sd">            extrinsics (np.ndarray): 4x4 camera-to-world transformation.</span>
+<span class="sd">            known_dims (dict): Dictionary of box class -&gt; [x, y, z] dimensions in meters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fx</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;fx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fy</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;fy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cx</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;cx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cy</span> <span class="o">=</span> <span class="n">intrinsics</span><span class="p">[</span><span class="s1">&#39;cy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span> <span class="o">=</span> <span class="n">extrinsics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_dims</span> <span class="o">=</span> <span class="n">known_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="BoxPoseEstimator.estimate_pose_from_patch"><a class="viewcode-back" href="../../lib.html#lib.box_pose_estimator.BoxPoseEstimator.estimate_pose_from_patch">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_pose_from_patch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">box_class</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate 6D pose from a planar patch assumed to belong to a box surface.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            patch (open3d.geometry.OrientedBoundingBox): The patch bounding box.</span>
+<span class="sd">            box_class (str): The class name of the box.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (center_position_world, rotation_matrix_world)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">center_cam</span> <span class="o">=</span> <span class="n">patch</span><span class="o">.</span><span class="n">get_center</span><span class="p">()</span>
+        <span class="n">R_cam</span> <span class="o">=</span> <span class="n">patch</span><span class="o">.</span><span class="n">R</span>
+
+        <span class="n">known_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">box_class</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+        <span class="n">face_dims</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">2</span><span class="p">]]),</span>
+            <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">2</span><span class="p">]]),</span>
+            <span class="s2">&quot;front&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="p">}</span>
+
+        <span class="n">patch_extent</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">extent</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">best_face</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">min_diff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">face</span><span class="p">,</span> <span class="n">dims</span> <span class="ow">in</span> <span class="n">face_dims</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_extent</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dims</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="n">min_diff</span><span class="p">:</span>
+                <span class="n">min_diff</span> <span class="o">=</span> <span class="n">diff</span>
+                <span class="n">best_face</span> <span class="o">=</span> <span class="n">face</span>
+
+        <span class="c1"># Compute rotation alignment based on face type</span>
+        <span class="k">if</span> <span class="n">best_face</span> <span class="o">==</span> <span class="s2">&quot;top&quot;</span><span class="p">:</span>
+            <span class="n">R_base</span> <span class="o">=</span> <span class="n">R_cam</span>
+            <span class="n">expected_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">patch_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">extent</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">flip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&lt;</span> \
+                   <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">))</span>
+            <span class="n">R_aligned</span> <span class="o">=</span> <span class="n">R_base</span> <span class="o">@</span> <span class="p">(</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_rotation_matrix_from_axis_angle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">best_face</span> <span class="o">==</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span>
+            <span class="n">R_base</span> <span class="o">=</span> <span class="n">R_cam</span> <span class="o">@</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_rotation_matrix_from_axis_angle</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">expected_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">patch_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">extent</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">flip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&lt;</span> \
+                   <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">))</span>
+            <span class="n">R_aligned</span> <span class="o">=</span> <span class="n">R_base</span> <span class="o">@</span> <span class="p">(</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_rotation_matrix_from_axis_angle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">best_face</span> <span class="o">==</span> <span class="s2">&quot;front&quot;</span><span class="p">:</span>
+            <span class="n">R_base</span> <span class="o">=</span> <span class="n">R_cam</span> <span class="o">@</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_rotation_matrix_from_axis_angle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">expected_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">known_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">known_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">patch_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">extent</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">flip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&lt;</span> \
+                   <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">))</span>
+            <span class="n">R_aligned</span> <span class="o">=</span> <span class="n">R_base</span> <span class="o">@</span> <span class="p">(</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_rotation_matrix_from_axis_angle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">R_aligned</span> <span class="o">=</span> <span class="n">R_cam</span>
+
+        <span class="n">center_world</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">center_cam</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">R_world</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">@</span> <span class="n">R_aligned</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">box_class</span><span class="p">,</span>
+            <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="n">center_world</span><span class="p">,</span>
+            <span class="s2">&quot;rotation_matrix&quot;</span><span class="p">:</span> <span class="n">R_world</span><span class="p">,</span>
+            <span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="n">known_dim</span><span class="p">,</span>
+            <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="n">best_face</span>
+        <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">center_world</span><span class="p">,</span> <span class="n">R_world</span></div>
+
+<div class="viewcode-block" id="BoxPoseEstimator.estimate_from_all"><a class="viewcode-back" href="../../lib.html#lib.box_pose_estimator.BoxPoseEstimator.estimate_from_all">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_from_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patch_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate poses for all patches in the list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            patch_list (list): List of dictionaries with &#39;points&#39; and &#39;class&#39; keys.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Estimated poses with world coordinates and rotation matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">patch_dict</span> <span class="ow">in</span> <span class="n">patch_list</span><span class="p">:</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">patch_dict</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">patch_dict</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimate_pose_from_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span></div>
+
+<div class="viewcode-block" id="BoxPoseEstimator.print_poses"><a class="viewcode-back" href="../../lib.html#lib.box_pose_estimator.BoxPoseEstimator.print_poses">[docs]</a>    <span class="k">def</span> <span class="nf">print_poses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print all estimated poses in a readable format to the console.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pose</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Box </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">pose</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">) - face: </span><span class="si">{</span><span class="n">pose</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Position: </span><span class="si">{</span><span class="n">pose</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Rotation matrix:</span><span class="se">\n</span><span class="si">{</span><span class="n">pose</span><span class="p">[</span><span class="s1">&#39;rotation_matrix&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Dimensions: </span><span class="si">{</span><span class="n">pose</span><span class="p">[</span><span class="s1">&#39;dimensions&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BoxPoseEstimator.visualize_poses"><a class="viewcode-back" href="../../lib.html#lib.box_pose_estimator.BoxPoseEstimator.visualize_poses">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_poses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pointcloud</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorize_pc_with_image</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize estimated poses with Open3D coordinate frames and spheres.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image (np.ndarray, optional): Not currently used.</span>
+<span class="sd">            pointcloud (open3d.geometry.PointCloud, optional): Optional background point cloud.</span>
+<span class="sd">            colorize_pc_with_image (bool): Unused option for future extension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">pointcloud</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">pose</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poses_world</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="s1">&#39;rotation_matrix&#39;</span><span class="p">]</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="s1">&#39;dimensions&#39;</span><span class="p">]</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">T</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span>
+            <span class="n">T</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
+
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">TriangleMesh</span><span class="o">.</span><span class="n">create_coordinate_frame</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">frame</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+            <span class="n">sphere</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">TriangleMesh</span><span class="o">.</span><span class="n">create_sphere</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">sphere</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+            <span class="n">sphere</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+            <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;Estimated Box Poses&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Neura Robotics GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

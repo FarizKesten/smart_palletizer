@@ -10,7 +10,7 @@ Welcome to the [NEURA robotics](https://neura-robotics.com) Smart Palletizer cha
 
 You are free to use **Python or C++**, preferably with Robotics Operating System ([**ROS**](https://www.ros.org)) either ROS1 or ROS2.
 
-Please explain your **methodology** into solving the challenging tasks either via updating this readme file or via creating a separate Markdown file. 
+Please explain your **methodology** into solving the challenging tasks either via updating this readme file or via creating a separate Markdown file.
 
 > Please note that using [ChatGPT](https://chatgpt.com) is OK as long as you understand what you copy from there!.
 
@@ -20,7 +20,7 @@ Tasks have various complexity, optimal thing is to solve them all, however if yo
 
 > Tasks are not interdependent.
 
-### Input 
+### Input
 
 ![color_image](/data/medium_box/color_image.png)
 
@@ -92,7 +92,7 @@ cd smart_palletizer/docs
 pip3 install -U pip
 pip3 install -r requirements.txt
 make clean && sphinx-apidoc -f -o source ../src/smart_palletizer
-make html SPHINXBUILD="python3 <path_to_sphinx>/sphinx-build"
+make html SPHINXBUILD="python3 /opt/conda/envs/rosenv/bin/sphinx-build"
 ##----------
 ## Example:
 ##----------

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>box_detector_node module &mdash; neurapy_ai_utils 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/neura_logo.svg"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="planar_patch_node module" href="planar_patch_node.html" />
+    <link rel="prev" title="Modules" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> neurapy_ai_utils
+            <img src="_static/logo.jpg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">box_detector_node module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#box_detector_node.BoxDetectorNode"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.color_callback"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.color_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.depth_callback"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.depth_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.try_detect"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.try_detect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="planar_patch_node.html">planar_patch_node module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">box_detector_node module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#box_detector_node.BoxDetectorNode"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.color_callback"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.color_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.depth_callback"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.depth_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#box_detector_node.BoxDetectorNode.try_detect"><code class="docutils literal notranslate"><span class="pre">BoxDetectorNode.try_detect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="planar_patch_node.html">planar_patch_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib.html">lib package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">neurapy_ai_utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
+      <li class="breadcrumb-item active">box_detector_node module</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-box_detector_node">
+<span id="box-detector-node-module"></span><h1>box_detector_node module<a class="headerlink" href="#module-box_detector_node" title="Permalink to this heading"></a></h1>
+<p>ROS node for detecting boxes using YOLO and publishing Detection2D messages.</p>
+<p>This node subscribes to RGB and depth images from a camera, performs
+YOLO-based object detection using a depth-aware mask, and publishes results as
+<cite>vision_msgs/Detection2DArray</cite> and annotated images.</p>
+<dl class="simple">
+<dt>Publishes:</dt><dd><ul class="simple">
+<li><p>/detected_boxes (vision_msgs/Detection2DArray): List of 2D detections</p></li>
+<li><p>/box_detector/image (sensor_msgs/Image): Annotated RGB image</p></li>
+</ul>
+</dd>
+<dt>Subscribes:</dt><dd><ul class="simple">
+<li><p>/camera/color/image_raw (sensor_msgs/Image): Color image</p></li>
+<li><p>/camera/aligned_depth_to_color/image_raw (sensor_msgs/Image): Depth image</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">param ~model_path<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to the YOLO model weights (.pt)</p>
+</dd>
+<dt class="field-even">type ~model_path<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="box_detector_node.BoxDetectorNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">box_detector_node.</span></span><span class="sig-name descname"><span class="pre">BoxDetectorNode</span></span><a class="reference internal" href="_modules/box_detector_node.html#BoxDetectorNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#box_detector_node.BoxDetectorNode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A ROS node that detects boxes in RGB images using a YOLO model,
+and publishes the results as Detection2DArray and annotated images.</p>
+<p>Initialize the BoxDetectorNode. Sets up ROS publishers, subscribers, and parameters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="box_detector_node.BoxDetectorNode.color_callback">
+<span class="sig-name descname"><span class="pre">color_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/box_detector_node.html#BoxDetectorNode.color_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#box_detector_node.BoxDetectorNode.color_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Callback for the color image topic.
+Converts the image to OpenCV format and triggers detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>sensor_msgs.msg.Image</em>) – Incoming color image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="box_detector_node.BoxDetectorNode.depth_callback">
+<span class="sig-name descname"><span class="pre">depth_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/box_detector_node.html#BoxDetectorNode.depth_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#box_detector_node.BoxDetectorNode.depth_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Callback for the depth image topic.
+Converts the image to OpenCV format and triggers detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>sensor_msgs.msg.Image</em>) – Incoming depth image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="box_detector_node.BoxDetectorNode.try_detect">
+<span class="sig-name descname"><span class="pre">try_detect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/box_detector_node.html#BoxDetectorNode.try_detect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#box_detector_node.BoxDetectorNode.try_detect" title="Permalink to this definition"></a></dt>
+<dd><p>Perform detection if both color and depth images are available.
+Publishes results to <cite>/detected_boxes</cite> and <cite>/box_detector/image</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="planar_patch_node.html" class="btn btn-neutral float-right" title="planar_patch_node module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Neura Robotics GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

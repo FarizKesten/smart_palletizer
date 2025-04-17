@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib package &mdash; neurapy_ai_utils 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/neura_logo.svg"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="planar_patch_node module" href="planar_patch_node.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> neurapy_ai_utils
+            <img src="_static/logo.jpg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="box_detector_node.html">box_detector_node module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_patch_node.html">planar_patch_node module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lib.box_pose_estimator">lib.box_pose_estimator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.fx"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.fx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.fy"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.fy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.cx"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.cx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.cy"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.cy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.extrinsics"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.extrinsics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.known_dims"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.known_dims</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.poses_world"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.poses_world</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.estimate_from_all"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.estimate_from_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.estimate_pose_from_patch"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.estimate_pose_from_patch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.print_poses"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.print_poses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.box_pose_estimator.BoxPoseEstimator.visualize_poses"><code class="docutils literal notranslate"><span class="pre">BoxPoseEstimator.visualize_poses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lib.masked_yolo_detector">lib.masked_yolo_detector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.color_image"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.color_image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.depth_image"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.depth_image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.model"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.min_depth"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.min_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.max_depth"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.max_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.mask"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.mask</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.filtered_boxes"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.filtered_boxes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.min_box_area"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.min_box_area</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.max_box_area"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.max_box_area</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.create_mask"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.create_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.print_box_details"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.print_box_details()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.run_detection"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.run_detection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.set_box_area"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.set_box_area()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.masked_yolo_detector.MaskedYOLODetector.visualize_input"><code class="docutils literal notranslate"><span class="pre">MaskedYOLODetector.visualize_input()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lib.planar_patch_detector">lib.planar_patch_detector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.colorize_pointcloud_from_image"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.colorize_pointcloud_from_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.compute_normals"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.compute_normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.create_full_pointcloud"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.create_full_pointcloud()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.crop_pointcloud_from_bbox"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.crop_pointcloud_from_bbox()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.detect_planar_patches"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.detect_planar_patches()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.expand_bbox"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.expand_bbox()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.filter_points_on_plane"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.filter_points_on_plane()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.fit_plane_to_points"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.fit_plane_to_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.get_cleaned_surfaces"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.get_cleaned_surfaces()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.get_combined_plane_points"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.get_combined_plane_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.get_full_scene_pcd"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.get_full_scene_pcd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.get_results"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.get_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.get_top_patch_points"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.get_top_patch_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.pointcloud_to_surface_mesh"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.pointcloud_to_surface_mesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.process_all"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.process_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.set_yolo_detections"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.set_yolo_detections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_2d"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_3d"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_3d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_colored_surfaces"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_colored_surfaces()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_full_2d"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_full_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_overlay_top"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_overlay_top()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_patch_overlay"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.visualize_patch_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lib.planar_patch_detector.PlanarPatchDetector.voxel_downsampling"><code class="docutils literal notranslate"><span class="pre">PlanarPatchDetector.voxel_downsampling()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lib.utils">lib.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lib.utils.get_camera_extrinsics"><code class="docutils literal notranslate"><span class="pre">get_camera_extrinsics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lib.utils.get_camera_intrinsics"><code class="docutils literal notranslate"><span class="pre">get_camera_intrinsics()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-lib">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">neurapy_ai_utils</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">lib package</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lib-package">
+<h1>lib package<a class="headerlink" href="#lib-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-lib.box_pose_estimator">
+<span id="lib-box-pose-estimator-module"></span><h2>lib.box_pose_estimator module<a class="headerlink" href="#module-lib.box_pose_estimator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.box_pose_estimator.</span></span><span class="sig-name descname"><span class="pre">BoxPoseEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intrinsics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrinsics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">known_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/box_pose_estimator.html#BoxPoseEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Estimates 6D pose of boxes based on planar patches from point clouds.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.fx">
+<span class="sig-name descname"><span class="pre">fx</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.fx" title="Permalink to this definition"></a></dt>
+<dd><p>Focal length in x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.fy">
+<span class="sig-name descname"><span class="pre">fy</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.fy" title="Permalink to this definition"></a></dt>
+<dd><p>Focal length in y.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.cx">
+<span class="sig-name descname"><span class="pre">cx</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.cx" title="Permalink to this definition"></a></dt>
+<dd><p>Optical center x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.cy">
+<span class="sig-name descname"><span class="pre">cy</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.cy" title="Permalink to this definition"></a></dt>
+<dd><p>Optical center y.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.extrinsics">
+<span class="sig-name descname"><span class="pre">extrinsics</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.extrinsics" title="Permalink to this definition"></a></dt>
+<dd><p>4x4 transformation matrix from camera to world.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.known_dims">
+<span class="sig-name descname"><span class="pre">known_dims</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.known_dims" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary mapping class names to (x, y, z) box dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.poses_world">
+<span class="sig-name descname"><span class="pre">poses_world</span></span><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.poses_world" title="Permalink to this definition"></a></dt>
+<dd><p>List of dictionaries with estimated poses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize BoxPoseEstimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>intrinsics</strong> (<em>dict</em>) – Dictionary with keys ‘fx’, ‘fy’, ‘cx’, ‘cy’.</p></li>
+<li><p><strong>extrinsics</strong> (<em>np.ndarray</em>) – 4x4 camera-to-world transformation.</p></li>
+<li><p><strong>known_dims</strong> (<em>dict</em>) – Dictionary of box class -&gt; [x, y, z] dimensions in meters.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.estimate_from_all">
+<span class="sig-name descname"><span class="pre">estimate_from_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/box_pose_estimator.html#BoxPoseEstimator.estimate_from_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.estimate_from_all" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate poses for all patches in the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>patch_list</strong> (<em>list</em>) – List of dictionaries with ‘points’ and ‘class’ keys.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated poses with world coordinates and rotation matrices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.estimate_pose_from_patch">
+<span class="sig-name descname"><span class="pre">estimate_pose_from_patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/box_pose_estimator.html#BoxPoseEstimator.estimate_pose_from_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.estimate_pose_from_patch" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate 6D pose from a planar patch assumed to belong to a box surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patch</strong> (<em>open3d.geometry.OrientedBoundingBox</em>) – The patch bounding box.</p></li>
+<li><p><strong>box_class</strong> (<em>str</em>) – The class name of the box.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(center_position_world, rotation_matrix_world)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.print_poses">
+<span class="sig-name descname"><span class="pre">print_poses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/box_pose_estimator.html#BoxPoseEstimator.print_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.print_poses" title="Permalink to this definition"></a></dt>
+<dd><p>Print all estimated poses in a readable format to the console.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.box_pose_estimator.BoxPoseEstimator.visualize_poses">
+<span class="sig-name descname"><span class="pre">visualize_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointcloud</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorize_pc_with_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/box_pose_estimator.html#BoxPoseEstimator.visualize_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.box_pose_estimator.BoxPoseEstimator.visualize_poses" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize estimated poses with Open3D coordinate frames and spheres.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Not currently used.</p></li>
+<li><p><strong>pointcloud</strong> (<em>open3d.geometry.PointCloud</em><em>, </em><em>optional</em>) – Optional background point cloud.</p></li>
+<li><p><strong>colorize_pc_with_image</strong> (<em>bool</em>) – Unused option for future extension.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.masked_yolo_detector">
+<span id="lib-masked-yolo-detector-module"></span><h2>lib.masked_yolo_detector module<a class="headerlink" href="#module-lib.masked_yolo_detector" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.masked_yolo_detector.</span></span><span class="sig-name descname"><span class="pre">MaskedYOLODetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1390</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1766</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_box_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_box_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper for YOLO detection that filters detections using a depth-based mask.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.color_image">
+<span class="sig-name descname"><span class="pre">color_image</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.color_image" title="Permalink to this definition"></a></dt>
+<dd><p>The input BGR color image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.depth_image">
+<span class="sig-name descname"><span class="pre">depth_image</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.depth_image" title="Permalink to this definition"></a></dt>
+<dd><p>The input depth image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.model" title="Permalink to this definition"></a></dt>
+<dd><p>Loaded YOLO model from ultralytics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>YOLO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.min_depth">
+<span class="sig-name descname"><span class="pre">min_depth</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.min_depth" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum valid depth threshold (in depth units).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.max_depth">
+<span class="sig-name descname"><span class="pre">max_depth</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.max_depth" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum valid depth threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.mask" title="Permalink to this definition"></a></dt>
+<dd><p>Binary mask of region of interest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.filtered_boxes">
+<span class="sig-name descname"><span class="pre">filtered_boxes</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.filtered_boxes" title="Permalink to this definition"></a></dt>
+<dd><p>Final boxes that are within the mask and size constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.min_box_area">
+<span class="sig-name descname"><span class="pre">min_box_area</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.min_box_area" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum allowed bounding box area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.max_box_area">
+<span class="sig-name descname"><span class="pre">max_box_area</span></span><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.max_box_area" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum allowed bounding box area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the detector and load the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color_image</strong> (<em>np.ndarray</em>) – Color image (BGR).</p></li>
+<li><p><strong>depth_image</strong> (<em>np.ndarray</em>) – Corresponding depth image (single-channel).</p></li>
+<li><p><strong>model_path</strong> (<em>str</em>) – Path to the YOLO model (.pt).</p></li>
+<li><p><strong>min_depth</strong> (<em>int</em>) – Minimum depth to be considered valid.</p></li>
+<li><p><strong>max_depth</strong> (<em>int</em>) – Maximum depth to be considered valid.</p></li>
+<li><p><strong>min_box_area</strong> (<em>int</em>) – Minimum bounding box area to be valid.</p></li>
+<li><p><strong>max_box_area</strong> (<em>int</em>) – Maximum bounding box area to be valid.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.create_mask">
+<span class="sig-name descname"><span class="pre">create_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector.create_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.create_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a binary mask using depth filtering and morphological operations.
+Keeps the largest connected region to reduce false detections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.print_box_details">
+<span class="sig-name descname"><span class="pre">print_box_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector.print_box_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.print_box_details" title="Permalink to this definition"></a></dt>
+<dd><p>Print the details of the filtered boxes and their mask overlap percentage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.run_detection">
+<span class="sig-name descname"><span class="pre">run_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">visualize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector.run_detection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.run_detection" title="Permalink to this definition"></a></dt>
+<dd><p>Run the YOLO model and filter bounding boxes using the mask and area limits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>visualize</strong> (<em>bool</em>) – If True, displays detection results using matplotlib.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered boxes in the form (class_name, confidence, (x1, y1, x2, y2)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.set_box_area">
+<span class="sig-name descname"><span class="pre">set_box_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_area</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector.set_box_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.set_box_area" title="Permalink to this definition"></a></dt>
+<dd><p>Update bounding box area constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_area</strong> (<em>int</em>) – Minimum bounding box area.</p></li>
+<li><p><strong>max_area</strong> (<em>int</em>) – Maximum bounding box area.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.masked_yolo_detector.MaskedYOLODetector.visualize_input">
+<span class="sig-name descname"><span class="pre">visualize_input</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/masked_yolo_detector.html#MaskedYOLODetector.visualize_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.masked_yolo_detector.MaskedYOLODetector.visualize_input" title="Permalink to this definition"></a></dt>
+<dd><p>Display the original color image, depth image, and the masked region using matplotlib.
+Used for debugging and inspection.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.planar_patch_detector">
+<span id="lib-planar-patch-detector-module"></span><h2>lib.planar_patch_detector module<a class="headerlink" href="#module-lib.planar_patch_detector" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.planar_patch_detector.</span></span><span class="sig-name descname"><span class="pre">PlanarPatchDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intrinsics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">known_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to detect planar patches in a point cloud generated from a depth image.
+Also implement some filtering to remove noise and outliers</p>
+<p>Initialize the PlanarPatchDetector.
+:param color_img: Color image (BGR format).
+:param depth_img: Depth image (single channel).
+:param intrinsics: Camera intrinsics (fx, fy, cx, cy).
+:param known_dims: Known dimensions of the boxes(small_box &amp; medium_box) in the scene.
+:param depth_scale: Scale factor for depth image
+:param expand_ratio: Ratio to expand the bounding box around detected objects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.colorize_pointcloud_from_image">
+<span class="sig-name descname"><span class="pre">colorize_pointcloud_from_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.colorize_pointcloud_from_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.colorize_pointcloud_from_image" title="Permalink to this definition"></a></dt>
+<dd><p>Colorize the point cloud using the color image.
+:param pcd: Point cloud to colorize
+:return: Colorized point cloud</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.compute_normals">
+<span class="sig-name descname"><span class="pre">compute_normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.compute_normals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.compute_normals" title="Permalink to this definition"></a></dt>
+<dd><p>Compute normals from the points</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.create_full_pointcloud">
+<span class="sig-name descname"><span class="pre">create_full_pointcloud</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.create_full_pointcloud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.create_full_pointcloud" title="Permalink to this definition"></a></dt>
+<dd><p>Converts every pixel in the depth image to a 3D point using a pinhole camera model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.crop_pointcloud_from_bbox">
+<span class="sig-name descname"><span class="pre">crop_pointcloud_from_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.crop_pointcloud_from_bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.crop_pointcloud_from_bbox" title="Permalink to this definition"></a></dt>
+<dd><p>Converts the cropped image region to a point cloud</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.detect_planar_patches">
+<span class="sig-name descname"><span class="pre">detect_planar_patches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal_variance_threshold_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coplanarity_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_plane_edge_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.detect_planar_patches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.detect_planar_patches" title="Permalink to this definition"></a></dt>
+<dd><p>Detect planar patches in the point cloud
+:param pcd: Point cloud to process
+:param normal_variance_threshold_deg: Normal variance threshold in degrees
+:param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)
+:param min_plane_edge_length: Minimum edge length of the plane
+:param min_num_points: Minimum number of points to consider a patch
+:param knn: Number of nearest neighbors for the KDTree search
+:return: List of detected planar patches</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.expand_bbox">
+<span class="sig-name descname"><span class="pre">expand_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.expand_bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.expand_bbox" title="Permalink to this definition"></a></dt>
+<dd><p>Extend the area of bbox</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.filter_points_on_plane">
+<span class="sig-name descname"><span class="pre">filter_points_on_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.filter_points_on_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.filter_points_on_plane" title="Permalink to this definition"></a></dt>
+<dd><p>Filter points from the point cloud that are within a distance to the plane.
+plane_model: [a, b, c, d] from ax + by + cz + d = 0
+threshold: max distance in meters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.fit_plane_to_points">
+<span class="sig-name descname"><span class="pre">fit_plane_to_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.fit_plane_to_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.fit_plane_to_points" title="Permalink to this definition"></a></dt>
+<dd><p>Fit a plane to the given points using RANSAC
+:param pcd_points: Point cloud to process
+:param distance_threshold: Maximum distance from the plane to consider a point as an inlier
+:return: Plane model coefficients [a, b, c, d] and inlier indices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.get_cleaned_surfaces">
+<span class="sig-name descname"><span class="pre">get_cleaned_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.get_cleaned_surfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.get_cleaned_surfaces" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.get_combined_plane_points">
+<span class="sig-name descname"><span class="pre">get_combined_plane_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.get_combined_plane_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.get_combined_plane_points" title="Permalink to this definition"></a></dt>
+<dd><p>Return all cleaned surface inlier points as a single list of 3D points (for PointCloud2 publishing in ROS)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.get_full_scene_pcd">
+<span class="sig-name descname"><span class="pre">get_full_scene_pcd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.get_full_scene_pcd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.get_full_scene_pcd" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.get_results">
+<span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.get_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.get_results" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.get_top_patch_points">
+<span class="sig-name descname"><span class="pre">get_top_patch_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.get_top_patch_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.get_top_patch_points" title="Permalink to this definition"></a></dt>
+<dd><p>Return point clouds of top selected planar patches (those visualized in 3D)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.pointcloud_to_surface_mesh">
+<span class="sig-name descname"><span class="pre">pointcloud_to_surface_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.pointcloud_to_surface_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.pointcloud_to_surface_mesh" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a dense point cloud into a surface mesh using Poisson reconstruction.
+Works best if the point cloud represents a flat or smooth surface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.process_all">
+<span class="sig-name descname"><span class="pre">process_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">visualize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualize_individual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal_variance_threshold_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coplanarity_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_plane_edge_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_plane_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.process_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.process_all" title="Permalink to this definition"></a></dt>
+<dd><p>Run the full pipeline per detection and visualize on the full corrected point cloud.
+:param visualize: Whether to visualize the results
+:param visualize_individual: Whether to visualize individual patches
+:param mode: Visualization mode (‘2d’ or ‘3d’)
+:param normal_variance_threshold_deg: Normal variance threshold in degrees
+:param coplanarity_deg: Coplanarity threshold in degrees (angle between normals)
+:param min_plane_edge_length: Minimum edge length of the plane
+:param min_num_points: Minimum number of points to consider a patch
+:param knn: Number of nearest neighbors for the KDTree search
+:param voxel_size: Voxel size for downsampling
+:param distance_threshold: Maximum distance from the plane to consider a point as an inlier
+:param nb_neighbors: Number of neighbors for statistical outlier removal
+:param std_ratio: Standard deviation ratio for statistical outlier removal
+:param min_plane_area: Minimum area of the plane to consider it valid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.set_yolo_detections">
+<span class="sig-name descname"><span class="pre">set_yolo_detections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.set_yolo_detections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.set_yolo_detections" title="Permalink to this definition"></a></dt>
+<dd><p>Detections format: list of (class, conf, (x1, y1, x2, y2))</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_2d">
+<span class="sig-name descname"><span class="pre">visualize_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_2d" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize patches in 2D on the image
+:param patches: List of patches to visualize
+:param box_index: Index of the bounding box
+:param cls: Class of the detected object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_3d">
+<span class="sig-name descname"><span class="pre">visualize_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_3d" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize patches in 3D
+:param patches: List of patches to visualize
+:param colors: List of colors for the patches
+:param box_index: Index of the bounding box
+:param cls: Class of the detected object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_colored_surfaces">
+<span class="sig-name descname"><span class="pre">visualize_colored_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_colored_surfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_colored_surfaces" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize all cleaned and colorized planar surfaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_full_2d">
+<span class="sig-name descname"><span class="pre">visualize_full_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_full_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_full_2d" title="Permalink to this definition"></a></dt>
+<dd><p>Return a 2D overlay image of all patches drawn over the depth map.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_overlay_top">
+<span class="sig-name descname"><span class="pre">visualize_overlay_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_overlay_top"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_overlay_top" title="Permalink to this definition"></a></dt>
+<dd><p>Return a 2D overlay image of the top patches drawn over the depth map
+:param return_image: If True, return the overlay image instead of displaying it
+:return: Overlay image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.visualize_patch_overlay">
+<span class="sig-name descname"><span class="pre">visualize_patch_overlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd_unused</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.visualize_patch_overlay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.visualize_patch_overlay" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize the patches in 2D or 3D based on the mode.
+:param pcd_unused: Unused parameter, can be removed if not needed
+:param patches: List of patches to visualize
+:param colors: List of colors for the patches
+:param box_index: Index of the bounding box
+:param cls: Class of the detected object
+:param mode: Visualization mode (‘2d’ or ‘3d’)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.planar_patch_detector.PlanarPatchDetector.voxel_downsampling">
+<span class="sig-name descname"><span class="pre">voxel_downsampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/planar_patch_detector.html#PlanarPatchDetector.voxel_downsampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.planar_patch_detector.PlanarPatchDetector.voxel_downsampling" title="Permalink to this definition"></a></dt>
+<dd><p>Downsample the point cloud using a voxel grid filter.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.utils">
+<span id="lib-utils-module"></span><h2>lib.utils module<a class="headerlink" href="#module-lib.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.utils.get_camera_extrinsics">
+<span class="sig-prename descclassname"><span class="pre">lib.utils.</span></span><span class="sig-name descname"><span class="pre">get_camera_extrinsics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/utils.html#get_camera_extrinsics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.utils.get_camera_extrinsics" title="Permalink to this definition"></a></dt>
+<dd><p>Load camera extrinsic matrix from a JSON file.</p>
+<p>The JSON is expected to contain a key ‘cam2root’ representing a 4x4 transformation matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path to the JSON file containing extrinsics.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>4x4 numpy array representing the transformation from camera to world coordinates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.utils.get_camera_intrinsics">
+<span class="sig-prename descclassname"><span class="pre">lib.utils.</span></span><span class="sig-name descname"><span class="pre">get_camera_intrinsics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/utils.html#get_camera_intrinsics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.utils.get_camera_intrinsics" title="Permalink to this definition"></a></dt>
+<dd><p>Load camera intrinsic parameters from a JSON file.</p>
+<p>The JSON is expected to contain keys: ‘fx’, ‘fy’, ‘cx’, ‘cy’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path to the JSON file containing intrinsics.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with intrinsic parameters.</dt><dd><p>Example: {‘fx’: float, ‘fy’: float, ‘cx’: float, ‘cy’: float}</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-lib">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lib" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="planar_patch_node.html" class="btn btn-neutral float-left" title="planar_patch_node module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Neura Robotics GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

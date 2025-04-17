@@ -5,18 +5,35 @@ from ultralytics import YOLO
 
 
 class MaskedYOLODetector:
+    """
+    A wrapper for YOLO detection that filters detections using a depth-based mask.
+
+    Attributes:
+        color_image (np.ndarray): The input BGR color image.
+        depth_image (np.ndarray): The input depth image.
+        model (YOLO): Loaded YOLO model from ultralytics.
+        min_depth (int): Minimum valid depth threshold (in depth units).
+        max_depth (int): Maximum valid depth threshold.
+        mask (np.ndarray): Binary mask of region of interest.
+        filtered_boxes (list): Final boxes that are within the mask and size constraints.
+        min_box_area (int): Minimum allowed bounding box area.
+        max_box_area (int): Maximum allowed bounding box area.
+    """
+
     def __init__(self, color_image, depth_image, model_path,
                  min_depth=1390, max_depth=1766,
                  min_box_area=10, max_box_area=10000):
         """
-        Initialize the Masked YOLO Detector.
-        :param color_image: The color image (BGR format).
-        :param depth_image: The depth image (single channel).
-        :param model_path: Path to the YOLO model.
-        :param min_depth: Minimum depth for filtering out intersting  area
-        :param max_depth: Maximum depth for filtering out intersting area
-        :param min_box_area: Minimum area of the bounding box to consider
-        :param max_box_area: Maximum area of the bounding box to consider
+        Initialize the detector and load the model.
+
+        Args:
+            color_image (np.ndarray): Color image (BGR).
+            depth_image (np.ndarray): Corresponding depth image (single-channel).
+            model_path (str): Path to the YOLO model (.pt).
+            min_depth (int): Minimum depth to be considered valid.
+            max_depth (int): Maximum depth to be considered valid.
+            min_box_area (int): Minimum bounding box area to be valid.
+            max_box_area (int): Maximum bounding box area to be valid.
         """
         self.color_image = color_image
         self.depth_image = depth_image
@@ -30,18 +47,19 @@ class MaskedYOLODetector:
 
     def set_box_area(self, min_area, max_area):
         """
-        Set the minimum and maximum area for the bounding boxes.
-        :param min_area: Minimum area of the bounding box to consider
-        :param max_area: Maximum area of the bounding box to consider
+        Update bounding box area constraints.
+
+        Args:
+            min_area (int): Minimum bounding box area.
+            max_area (int): Maximum bounding box area.
         """
         self.min_box_area = min_area
         self.max_box_area = max_area
 
     def create_mask(self):
         """
-        Create a mask based on the depth image to filter out regions of interest.
-        The mask is created by thresholding the depth image and applying morphological operations.
-        The largest connected component is retained as the mask.
+        Generate a binary mask using depth filtering and morphological operations.
+        Keeps the largest connected region to reduce false detections.
         """
         depth_mask = ((self.depth_image > self.min_depth) & (self.depth_image < self.max_depth)).astype(np.uint8) * 255
 
@@ -61,6 +79,10 @@ class MaskedYOLODetector:
         self.mask = (labels == largest_label).astype(np.uint8) * 255
 
     def visualize_input(self):
+        """
+        Display the original color image, depth image, and the masked region using matplotlib.
+        Used for debugging and inspection.
+        """
         depth_display = cv.normalize(self.depth_image, None, 0, 255, cv.NORM_MINMAX).astype(np.uint8)
         masked_color = cv.bitwise_and(self.color_image, self.color_image, mask=self.mask)
         masked_color = cv.cvtColor(masked_color, cv.COLOR_BGR2RGB)
@@ -85,7 +107,13 @@ class MaskedYOLODetector:
 
     def run_detection(self, visualize=False):
         """
-        Run the YOLO detection on the color image and filter the results based on the mask.
+        Run the YOLO model and filter bounding boxes using the mask and area limits.
+
+        Args:
+            visualize (bool): If True, displays detection results using matplotlib.
+
+        Returns:
+            list: Filtered boxes in the form (class_name, confidence, (x1, y1, x2, y2)).
         """
         results = self.model(self.color_image)
         result_img = self.color_image.copy()
@@ -137,9 +165,8 @@ class MaskedYOLODetector:
 
     def print_box_details(self):
         """
-        Print the detals of the filtered boxes
+        Print the details of the filtered boxes and their mask overlap percentage.
         """
-
         print(f"Found {len(self.filtered_boxes)} boxes inside the mask:")
         for cls, conf, (x1, y1, x2, y2) in self.filtered_boxes:
             print(f"Class: {cls}, Confidence: {conf:.2f}, Box: ({x1}, {y1}, {x2}, {y2})")
