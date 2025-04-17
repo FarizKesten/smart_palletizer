@@ -1,7 +1,7 @@
 # Smart Palletizer Challenge – Solution Summary
 
 This document summarizes my complete solution to the NEURA Robotics Smart Palletizer challenge, focusing on methodology, implementation, and results for each task.
-
+All implementation was done within a devcontainer setup. By building the docker image you should have the same environment as I do
 ---
 
 ## 1. 2D Box Detection – Synthetic Dataset + YOLO
