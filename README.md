@@ -105,8 +105,5 @@ rqt_image_view
 ![Planar Patch Detection 1](docs/imgs/planar1.png)
 ![Planar Patch Detection 2](docs/imgs/planar2.png)
 
-### Cleaned Point Cloud:
-![Cleaned Point Cloud](docs/imgs/clean_cloud.png)
-
 ### Pose Estimation:
 ![Pose Estimation](docs/imgs/rotation_estimation.png)
