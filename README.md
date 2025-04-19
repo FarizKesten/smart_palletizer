@@ -2,7 +2,7 @@
 
 This document summarizes my complete solution to the NEURA Robotics Smart Palletizer challenge.
 ---
-* Whole implementation was done within a devcontainer setup. By building the docker image you should have the same environment as I do. Also the docker image is generated via github action and can be pulled directly
+* Whole implementation was done within a devcontainer setup. By building the docker image you should have the same environment as I do. Also the docker image is generated via github action and can be pulled directly (https://github.com/FarizKesten/smart_palletizer/pkgs/container/smart-palletizer-docker)
 
 ## 1. 2D Box Detection – Synthetic Dataset + YOLO
 
