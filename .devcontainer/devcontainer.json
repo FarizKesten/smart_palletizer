@@ -4,13 +4,6 @@
     "dockerfile": "../Dockerfile"
   },
 
-  // "runArgs": [
-  //   "-e", "DISPLAY=host.docker.internal:0",
-  //   "-e", "QT_X11_NO_MITSHM=1",
-  //   "-e", "LIBGL_ALWAYS_INDIRECT=1",
-  //   "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
-  //   "-v", "${localEnv:HOME}/.Xauthority:/root/.Xauthority:rw"
-  // ],
   "runArgs": [
     "-e", "DISPLAY=:0",
     "-e", "QT_X11_NO_MITSHM=1",
@@ -20,8 +13,6 @@
 
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    // "source=/tmp/.X11-unix,target=/tmp/.X11-unix",
-    // "source=${localEnv:HOME}/.Xauthority,target=/root/.Xauthority"
   ],
 
   "customizations": {
