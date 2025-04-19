@@ -5,7 +5,41 @@
   },
   "runArgs": [
     "-e", "DISPLAY=:0",
+    "-e", "QT_X11_NO_MITSHM=1",{
+  "name": "ros2-noetic-gui",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "runArgs": [
+    "-e", "DISPLAY=:0",
     "-e", "QT_X11_NO_MITSHM=1",
+    "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+    "-v", "${localEnv:HOME}/.Xauthority:/home/ros/.Xauthority:rw"
+  ],
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "GitHub.codespaces",
+        "github.vscode-github-actions",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "github.copilot-workspace",
+        "GitHub.vscode-pull-request-github",
+        "GitHub.remotehub",
+        "GitHub.vscode-codeql"
+      ]
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "bash -c 'source /opt/ros/noetic/setup.bash && roscore'",
+  "tasks": []
+}
+
     "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
     "-v", "${localEnv:HOME}/.Xauthority:/home/ros/.Xauthority:rw"
   ],
