@@ -21,29 +21,30 @@ jobs:
       id-token: write
 
     steps:
+      # --- Free up disk space on the runner ---
+      - name: Free up disk space
+        run: |
+          echo "Before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /usr/local/share/boost
+          sudo docker image prune --all --force || true
+          sudo docker builder prune --all --force || true
+          sudo swapoff -a || true
+          sudo rm -f /swapfile || true
+          echo "After cleanup:"
+          df -h
+
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # --- Devcontainer validation step ---
-      - name: Validate Dev Container
-        uses: chrisreddington/validate-devcontainer@v0.0.1
-        with:
-          devcontainer-path: '.devcontainer/devcontainer.json'
-          validate-tasks: 'true'
-
-      # --- Build and run catkin_make run_tests in the devcontainer ---
-      - name: Run catkin_make run_tests in devcontainer
-        uses: devcontainers/ci@v0.3
-        with:
-          runCmd: |
-            source /opt/ros/noetic/setup.bash
-            catkin_make 
-            
 
       # --- Install cosign (except on PRs) ---
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
         with:
           cosign-release: 'v2.2.4'
 

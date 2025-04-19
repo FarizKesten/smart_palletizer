@@ -59,11 +59,21 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Miniforge (ARM-compatible Conda)
-ENV CONDA_DIR=/opt/conda
-RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O /tmp/miniforge.sh && \
-    bash /tmp/miniforge.sh -b -p $CONDA_DIR && \
+ENV CONDA_DIR=/opt/conda \
+    PATH="${CONDA_DIR}/bin:${PATH}"
+    
+# Dynamically select Miniforge installer based on architecture
+ARG TARGETARCH
+RUN case "${TARGETARCH}" in \
+      "arm64") \
+        MINIFORGE_ARCH="Linux-aarch64" ;; \
+      "amd64") \
+        MINIFORGE_ARCH="Linux-x86_64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac && \
+    wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-${MINIFORGE_ARCH}.sh" -O /tmp/miniforge.sh && \
+    bash /tmp/miniforge.sh -b -p "${CONDA_DIR}" && \
     rm /tmp/miniforge.sh
-
 # Set Conda in PATH and activate for all shells
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> /root/.bashrc
