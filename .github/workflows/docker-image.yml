@@ -14,7 +14,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/smart-palletizer-image
+  IMAGE_NAME: ${{ github.repository_owner }}/smart-palletizer-docker
 
 jobs:
   build:
