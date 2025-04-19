@@ -137,6 +137,6 @@ Output available in `docs/build/html/index.html`
 
 **data/model:** contains the trained YOLOv8 model
 
-**data/dataset:** contains the synthetic dataset. (I was complenting of removing these images from the repo since they are quite large, but I figure you might want to have them for testing purposes)
-
+**data/dataset:** contains the synthetic dataset. (Only first 20 images are saved to make this repo small. For training during synthertic data generation around 1000 dataset will
+be generated
 ---
