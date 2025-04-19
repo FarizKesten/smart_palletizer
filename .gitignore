@@ -6,4 +6,4 @@ build*
 lib/_dummy/*
 devel/lib/pkgconfig/box_detector.pc
 devel/lib/box_detector/cmake.lock
-frames.gv
+data/dataset_all/*

@@ -1,0 +1,1 @@
+In order to keep this repo small, only the first 20 images are saved as training dataset as a preview. The Pipeline will create around 1000 images for training
