@@ -1,6 +1,6 @@
 # Smart Palletizer Challenge – Solution Summary
 
-This document summarizes my complete solution to the NEURA Robotics Smart Palletizer challenge.
+This document summarizes my complete solution to the Smart Palletizer challenge.
 ---
 * Whole implementation was done within a devcontainer setup. By building the docker image you should have the same environment as I do. Also the docker image is generated via github action and can be pulled directly (https://github.com/FarizKesten/smart_palletizer/pkgs/container/smart-palletizer-docker)
 
